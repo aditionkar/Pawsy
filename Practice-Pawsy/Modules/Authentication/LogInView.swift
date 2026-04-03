@@ -4,19 +4,22 @@
 //
 //  Created by user@37 on 03/04/26.
 //
+
 import SwiftUI
 
 struct LoginView: View {
     @Binding var isPresented: Bool
+    @EnvironmentObject var authVM: AuthViewModel
+
     @State private var email = ""
     @State private var password = ""
     @State private var showRegister = false
+    @State private var isLoading = false
 
     var body: some View {
         NavigationStack {
             ZStack {
-                Color(.systemGroupedBackground)
-                    .ignoresSafeArea()
+                Color(.systemGroupedBackground).ignoresSafeArea()
 
                 VStack(spacing: 24) {
                     Spacer()
@@ -37,17 +40,40 @@ struct LoginView: View {
                             .cornerRadius(14)
                     }
 
+                    // Error message
+                    if let error = authVM.authError {
+                        Text(error)
+                            .font(.system(size: 13, design: .rounded))
+                            .foregroundColor(.red)
+                            .multilineTextAlignment(.center)
+                    }
+
                     Divider()
 
-                    Button(action: {}) {
-                        Text("Login")
-                            .font(.system(size: 17, weight: .semibold, design: .rounded))
-                            .frame(maxWidth: .infinity)
-                            .padding(.vertical, 16)
-                            .background(Color(.systemOrange))
-                            .foregroundColor(.white)
-                            .clipShape(Capsule())
+                    Button(action: {
+                        isLoading = true
+                        Task {
+                            await authVM.signIn(email: email, password: password)
+                            isLoading = false
+                            // RootView handles navigation automatically via isAuthenticated + userRole
+                        }
+                    }) {
+                        Group {
+                            if isLoading {
+                                ProgressView().tint(.white)
+                            } else {
+                                Text("Login")
+                                    .font(.system(size: 17, weight: .semibold, design: .rounded))
+                            }
+                        }
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 16)
+                        .background(Color(.systemOrange))
+                        .foregroundColor(.white)
+                        .clipShape(Capsule())
                     }
+                    .disabled(isLoading || email.isEmpty || password.isEmpty)
+                    .opacity((isLoading || email.isEmpty || password.isEmpty) ? 0.6 : 1.0)
 
                     HStack(spacing: 4) {
                         Text("Not a member?")

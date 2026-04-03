@@ -6,6 +6,7 @@
 import SwiftUI
 
 struct PetProfileLoadView: View {
+    @EnvironmentObject var authVM: AuthViewModel
     @State private var progress: CGFloat = 0
     @State private var isComplete = false
 
@@ -19,12 +20,10 @@ struct PetProfileLoadView: View {
 
                 // MARK: Paw + Ring
                 ZStack {
-                    // Track
                     Circle()
                         .stroke(Color(.secondarySystemGroupedBackground), lineWidth: 6)
                         .frame(width: 120, height: 120)
 
-                    // Progress ring
                     Circle()
                         .trim(from: 0, to: progress)
                         .stroke(
@@ -35,26 +34,13 @@ struct PetProfileLoadView: View {
                         .rotationEffect(.degrees(-90))
                         .animation(.easeInOut(duration: 1.8), value: progress)
 
-                    // Paw
                     ZStack {
-                        // Toe beans
                         Group {
-                            Ellipse()
-                                .frame(width: 10, height: 13)
-                                .offset(x: -12, y: -16)
-                            Ellipse()
-                                .frame(width: 10, height: 13)
-                                .offset(x: 12, y: -16)
-                            Ellipse()
-                                .frame(width: 9, height: 12)
-                                .offset(x: -19, y: -4)
-                            Ellipse()
-                                .frame(width: 9, height: 12)
-                                .offset(x: 19, y: -4)
-                            // Main pad
-                            Ellipse()
-                                .frame(width: 26, height: 22)
-                                .offset(y: 8)
+                            Ellipse().frame(width: 10, height: 13).offset(x: -12, y: -16)
+                            Ellipse().frame(width: 10, height: 13).offset(x: 12, y: -16)
+                            Ellipse().frame(width: 9, height: 12).offset(x: -19, y: -4)
+                            Ellipse().frame(width: 9, height: 12).offset(x: 19, y: -4)
+                            Ellipse().frame(width: 26, height: 22).offset(y: 8)
                         }
                         .foregroundColor(isComplete ? Color(.systemOrange) : Color(.systemOrange).opacity(0.4))
                         .animation(.easeInOut(duration: 0.4), value: isComplete)
@@ -78,7 +64,9 @@ struct PetProfileLoadView: View {
 
                 // MARK: Continue Button
                 if isComplete {
-                    Button(action: {}) {
+                    Button(action: {
+                        authVM.isNewUser = false  // RootView switches to MainTabView
+                    }) {
                         Text("Let's Go")
                             .font(.system(size: 17, weight: .semibold, design: .rounded))
                             .foregroundColor(.white)

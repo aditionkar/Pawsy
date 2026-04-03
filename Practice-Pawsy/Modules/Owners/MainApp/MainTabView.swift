@@ -4,7 +4,7 @@ struct MainTabView: View {
     var body: some View {
         TabView {
             
-            Text("Home Screen")
+            HomeView()
                 .tabItem {
                     Image(systemName: "house")
                     Text("Home")
