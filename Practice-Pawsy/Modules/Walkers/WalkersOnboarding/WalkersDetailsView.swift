@@ -23,6 +23,11 @@ struct WalkersDetailsView: View {
                 ScrollView {
                     VStack(spacing: 30) {
                         
+                        Text("Basic details")
+                            .font(.system(size: 28, weight: .bold))
+                            .padding(.top, 20)
+                            .padding(.horizontal)
+                        
                         // MARK: - Profile Image Picker UI
                         ZStack(alignment: .bottomTrailing) {
                             RoundedRectangle(cornerRadius: 25)
@@ -102,8 +107,6 @@ struct WalkersDetailsView: View {
                         .padding(.bottom, 20)
                 }
             }
-            .navigationTitle("Your Details")
-            .navigationBarTitleDisplayMode(.large)
         }
     }
 }

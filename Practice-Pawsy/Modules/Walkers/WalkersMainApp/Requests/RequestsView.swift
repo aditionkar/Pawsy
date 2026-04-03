@@ -21,6 +21,8 @@ struct PetRequest: Identifiable {
 }
 
 struct RequestsView: View {
+    @EnvironmentObject var authViewModel: AuthViewModel
+    
     @State private var requests = [
         PetRequest(initials: "JS", name: "Cooper", breed: "Golden Retriever", tag: "WALK", date: "Oct 24, 2023", time: "02:30 PM", duration: "45 Mins", distance: "1.2 Miles", avatarColor: Color.orange.opacity(0.2)),
         PetRequest(initials: "ML", name: "Luna", breed: "Siamese Cat", tag: "SIT", date: "Oct 26, 2023", time: "09:00 AM", duration: "2 Hours", distance: "0.8 Miles", avatarColor: Color.blue.opacity(0.1)),
@@ -64,6 +66,23 @@ struct RequestsView: View {
             } message: { request in
                 Text("Are you sure you want to proceed with \(request.name)?")
             }
+            .toolbar {
+                            ToolbarItem(placement: .navigationBarTrailing) {
+                                Menu {
+                                    Button(role: .destructive) {
+                                        Task {
+                                            await authViewModel.signOut()
+                                        }
+                                    } label: {
+                                        Label("Logout", systemImage: "rectangle.portrait.and.arrow.right")
+                                    }
+                                } label: {
+                                    Image(systemName: "ellipsis.circle") // The "eclipse" (ellipsis) symbol
+                                        .font(.title3)
+                                        .foregroundColor(.orange)
+                                }
+                            }
+                        }
         }
     }
 

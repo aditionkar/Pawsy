@@ -11,6 +11,7 @@ struct WalkersOnboardingView: View {
     // 1. Manage the current step (0 to 2)
     @State private var currentStep = 0
     @State private var isOnboardingComplete = false
+    @EnvironmentObject var authVM: AuthViewModel
     
     var body: some View {
         if isOnboardingComplete {
@@ -81,7 +82,7 @@ struct WalkersOnboardingView: View {
             if currentStep < 2 {
                 currentStep += 1
             } else {
-                isOnboardingComplete = true
+                authVM.completeOnboarding()
             }
         }
     }

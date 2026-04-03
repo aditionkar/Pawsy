@@ -26,6 +26,11 @@ struct WalkersAvailabilityView: View {
                 ScrollView {
                     VStack(alignment: .leading, spacing: 30) {
                         
+                        Text("When are you available?")
+                            .font(.system(size: 28, weight: .bold))
+                            .padding(.top, 20)
+                            .padding(.horizontal)
+                        
                         // MARK: - Select Work Days
                         VStack(alignment: .leading, spacing: 15) {
                             Text("SELECT WORK DAYS")
@@ -105,8 +110,6 @@ struct WalkersAvailabilityView: View {
                         .frame(height: 100)
                 )
             }
-            .navigationTitle("Availability")
-            .navigationBarTitleDisplayMode(.large)
         }
     }
 }

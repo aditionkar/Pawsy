@@ -20,7 +20,7 @@ struct WalkerOrSitterView: View {
                     VStack(alignment: .leading, spacing: 30) {
                         
                         Text("How do you want to help?")
-                            .font(.system(size: 34, weight: .bold))
+                            .font(.system(size: 28, weight: .bold))
                             .padding(.top, 20)
                             .padding(.horizontal)
                         
