@@ -19,7 +19,12 @@ struct AddMedicationView: View {
     
     // Reminder States
     @State private var setReminder = true
-    @State private var reminderTime = Date()
+    @State private var reminderTime1 = Date()
+    @State private var reminderTime2 = Date()
+    @State private var selectedDayOfWeek = "Monday"
+    @State private var monthlyDate = Date()
+    
+    let daysOfWeek = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
 
     var body: some View {
         ZStack(alignment: .bottom) {
@@ -33,8 +38,6 @@ struct AddMedicationView: View {
                             Text($0)
                         }
                     }
-                    
-                    DatePicker("Start Date", selection: $startDate, displayedComponents: .date)
                 }
                 
                 Section(header: Text("Instructions / Notes")) {
@@ -51,7 +54,7 @@ struct AddMedicationView: View {
                     }
                 }
                 
-                // MARK: Reminders Section
+                // MARK: Dynamic Reminders Section
                 Section(header: Text("REMINDERS").font(.caption)) {
                     Toggle(isOn: $setReminder.animation()) {
                         HStack(spacing: 12) {
@@ -63,11 +66,37 @@ struct AddMedicationView: View {
                     .tint(.orange)
                     
                     if setReminder {
-                        DatePicker(
-                            "Reminder Time",
-                            selection: $reminderTime,
-                            displayedComponents: .hourAndMinute
-                        )
+                        Group {
+                            switch frequency {
+                            case "Daily":
+                                DatePicker("Reminder Time", selection: $reminderTime1, displayedComponents: .hourAndMinute)
+                                    .accentColor(.orange)
+                                
+                            case "Twice a Day":
+                                DatePicker("First Dose", selection: $reminderTime1, displayedComponents: .hourAndMinute)
+                                    .accentColor(.orange)
+                                DatePicker("Second Dose", selection: $reminderTime2, displayedComponents: .hourAndMinute)
+                                    .accentColor(.orange)
+                                
+                            case "Weekly":
+                                Picker("Day of the Week", selection: $selectedDayOfWeek) {
+                                    ForEach(daysOfWeek, id: \.self) { day in
+                                        Text(day).tag(day)
+                                    }
+                                }
+                                DatePicker("Reminder Time", selection: $reminderTime1, displayedComponents: .hourAndMinute)
+                                    .accentColor(.orange)
+                                
+                            case "Monthly":
+                                DatePicker("Day of Month", selection: $monthlyDate, displayedComponents: .date)
+                                    .accentColor(.orange)
+                                DatePicker("Reminder Time", selection: $reminderTime1, displayedComponents: .hourAndMinute)
+                                    .accentColor(.orange)
+                                
+                            default:
+                                EmptyView()
+                            }
+                        }
                         .accentColor(.orange)
                     }
                 }
@@ -81,11 +110,11 @@ struct AddMedicationView: View {
             // MARK: Floating Action Button
             VStack {
                 Button(action: {
+                    // Logic to save based on frequency would go here
                     dismiss()
                 }) {
                     HStack {
                         Text("Add Medication Record")
-                        Image(systemName: "checkmark.circle")
                     }
                     .font(.headline)
                     .foregroundColor(.white)
@@ -110,15 +139,6 @@ struct AddMedicationView: View {
         .navigationTitle("Add Medication")
         .navigationBarTitleDisplayMode(.inline)
         .toolbar(.hidden, for: .tabBar)
-        .toolbar {
-            ToolbarItem(placement: .navigationBarTrailing) {
-                Button("Done") {
-                    dismiss()
-                }
-                .fontWeight(.bold)
-                .foregroundColor(.orange)
-            }
-        }
     }
 }
 

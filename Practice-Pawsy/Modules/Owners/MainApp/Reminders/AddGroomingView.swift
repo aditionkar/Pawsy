@@ -25,9 +25,6 @@ struct AddGroomingView: View {
                 Section(header: Text("Grooming Details")) {
                     TextField("Service Type (e.g. Full Groom, Nail Trim)", text: $groomingType)
                     
-                    // Date picker without time
-                    DatePicker("Date", selection: $date, displayedComponents: .date)
-                    
                     // Duration Picker (15 min intervals)
                     HStack {
                         Text("Duration")
@@ -38,6 +35,10 @@ struct AddGroomingView: View {
                                 .fontWeight(.medium)
                         }
                     }
+                    
+                    // Date picker without time
+                    DatePicker("Date", selection: $date, displayedComponents: .date)
+                        .accentColor(.orange)
                 }
                 
                 Section(header: Text("Notes")) {
@@ -92,7 +93,6 @@ struct AddGroomingView: View {
                 Button(action: { dismiss() }) {
                     HStack {
                         Text("Add Grooming ")
-                        Image(systemName: "checkmark.circle")
                     }
                     .font(.headline)
                     .foregroundColor(.white)

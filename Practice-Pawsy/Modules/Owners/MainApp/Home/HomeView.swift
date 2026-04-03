@@ -17,11 +17,39 @@ struct HomeView: View {
     let petImage: UIImage? = nil
 
     let todayReminders: [Reminder] = [
-        Reminder(title: "Rabies Booster", subtitle: "Due Nov 12", badge: "OVERDUE", badgeColor: .red, category: .vaccinations),
-        Reminder(title: "Full Grooming", subtitle: "9:30 AM", badge: "IN 2 DAYS", badgeColor: .yellow, category: .grooming),
-        Reminder(title: "Heartworm Pill", subtitle: "Every 1st of month", badge: "RECURRING", badgeColor: .gray, category: .medication),
+        // Vaccinations: vaccine name, next date/time, and previous date
+        Reminder(
+            title: "Rabies Booster",
+            subtitle: "Due Nov 12",
+            category: .vaccinations,
+            nextDate: "Nov 12, 2026",
+            nextTime: "11:00 AM",
+            previousDate: "Nov 10, 2023"
+        ),
+        
+        // Grooming: service name, duration, date, and frequency
+        Reminder(
+            title: "Full Grooming",
+            subtitle: "9:30 AM",
+            category: .grooming,
+            nextDate: "April 5, 2026",
+            nextTime: "9:30 AM",
+            frequency: "Monthly",
+            duration: "2.5 hours"
+        ),
+        
+        // Medication: medicine name, dosage, frequency, and next date/time
+        Reminder(
+            title: "Heartworm Pill",
+            subtitle: "Every 1st of month",
+            category: .medication,
+            nextDate: "May 1, 2026",
+            nextTime: "08:00 AM",
+            dosage: "1 Tablet (25mg)",
+            frequency: "Monthly"
+        )
     ]
-    
+
     let suggestions: [Suggestion] = [
         Suggestion(icon: "dog.walker", title: "Take your dog for a walk", subtitle: "30 min walk • 2 km away", color: .blue, action: "walk"),
         Suggestion(icon: "clock.badge.checkmark", title: "Short on time?", subtitle: "Book a pet walker", color: .orange, action: "book"),
@@ -282,15 +310,6 @@ struct HomeReminderRow: View {
                         .font(.system(size: 13, weight: .regular, design: .rounded))
                         .foregroundColor(.secondary)
                 }
-
-                // Badge
-                Text(reminder.badge)
-                    .font(.system(size: 11, weight: .semibold, design: .rounded))
-                    .foregroundColor(reminder.badgeColor)
-                    .padding(.horizontal, 8)
-                    .padding(.vertical, 3)
-                    .background(reminder.badgeColor.opacity(0.12))
-                    .clipShape(Capsule())
             }
 
             Spacer()

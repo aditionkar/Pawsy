@@ -16,6 +16,7 @@ struct AddVaccinationView: View {
     // Reminder States
     @State private var setReminder = true
     @State private var reminderDate = Calendar.current.date(byAdding: .year, value: 1, to: Date()) ?? Date()
+    @State private var reminderTime = Date()
 
     var body: some View {
         ZStack(alignment: .bottom) {
@@ -23,6 +24,7 @@ struct AddVaccinationView: View {
                 Section(header: Text("Vaccination Details")) {
                     TextField("Select Vaccine", text: $vaccineType)
                     DatePicker("Date", selection: $date, displayedComponents: .date)
+                        .accentColor(.orange)
                 }
                 
                 Section(header: Text("Notes")) {
@@ -59,6 +61,9 @@ struct AddVaccinationView: View {
                             displayedComponents: .date
                         )
                         .accentColor(.orange)
+                        DatePicker("Reminder Time", selection: $reminderTime, displayedComponents: .hourAndMinute)
+                            .accentColor(.orange)
+                        
                     }
                 }
                 
@@ -77,7 +82,6 @@ struct AddVaccinationView: View {
                 }) {
                     HStack {
                         Text("Add Vaccine Record")
-                        Image(systemName: "checkmark.circle")
                     }
                     .font(.headline)
                     .foregroundColor(.white)
@@ -102,15 +106,6 @@ struct AddVaccinationView: View {
         .navigationTitle("Add Vaccination")
         .navigationBarTitleDisplayMode(.inline)
         .toolbar(.hidden, for: .tabBar)
-        .toolbar {
-            ToolbarItem(placement: .navigationBarTrailing) {
-                Button("Done") {
-                    dismiss()
-                }
-                .fontWeight(.bold)
-                .foregroundColor(.orange)
-            }
-        }
     }
 }
 

@@ -16,6 +16,7 @@ struct AddDewormingView: View {
     // Reminder States
     @State private var setReminder = true
     @State private var reminderDate = Calendar.current.date(byAdding: .month, value: 3, to: Date()) ?? Date()
+    @State private var reminderTime = Date()
 
     var body: some View {
         ZStack(alignment: .bottom) {
@@ -24,6 +25,7 @@ struct AddDewormingView: View {
                     TextField("Medication Name (e.g. Drontal)", text: $medicationName)
                     TextField("Dosage (e.g. 1 tablet / 5ml)", text: $dosage)
                     DatePicker("Last Deworming Date", selection: $lastDate, displayedComponents: .date)
+                        .accentColor(.orange)
                 }
                 
                 // MARK: Reminders Section
@@ -44,6 +46,8 @@ struct AddDewormingView: View {
                             displayedComponents: .date
                         )
                         .accentColor(.orange)
+                        DatePicker("Next Dose Time", selection: $reminderTime, displayedComponents: .hourAndMinute)
+                            .accentColor(.orange)
                     }
                 }
                 
@@ -61,7 +65,6 @@ struct AddDewormingView: View {
                 }) {
                     HStack {
                         Text("Add Deworming Record")
-                        Image(systemName: "checkmark.circle")
                     }
                     .font(.headline)
                     .foregroundColor(.white)
@@ -86,15 +89,6 @@ struct AddDewormingView: View {
         .navigationTitle("Add Deworming")
         .navigationBarTitleDisplayMode(.inline)
         .toolbar(.hidden, for: .tabBar)
-        .toolbar {
-            ToolbarItem(placement: .navigationBarTrailing) {
-                Button("Done") {
-                    dismiss()
-                }
-                .fontWeight(.bold)
-                .foregroundColor(.orange)
-            }
-        }
     }
 }
 
