@@ -6,19 +6,80 @@
 //
 import SwiftUI
 
+enum ReminderCategory: String, CaseIterable {
+    case all = "All"
+    case vaccinations = "Vaccinations"
+    case grooming = "Grooming"
+    case deworming = "Deworming"
+    case medication = "Medication"
+    
+    var icon: String {
+        switch self {
+        case .all: return ""
+        case .vaccinations: return "syringe.fill"
+        case .grooming: return "scissors"
+        case .deworming: return "drop.fill"
+        case .medication: return "pills.fill"
+        }
+    }
+    
+    var iconBg: Color {
+        switch self {
+        case .all: return .clear
+        case .vaccinations: return Color(.systemBlue).opacity(0.1)
+        case .grooming: return Color(.systemYellow).opacity(0.1)
+        case .deworming: return Color(.systemTeal).opacity(0.1)
+        case .medication: return Color(.systemRed).opacity(0.1)
+        }
+    }
+    
+    var iconColor: Color {
+        switch self {
+        case .all: return .clear
+        case .vaccinations: return .blue
+        case .grooming: return .yellow
+        case .deworming: return .teal
+        case .medication: return .red
+        }
+    }
+    
+    var selectedPillColor: Color {
+        switch self {
+        case .all: return Color(.systemOrange)
+        case .vaccinations: return .blue
+        case .grooming: return .yellow
+        case .deworming: return .teal
+        case .medication: return .red
+        }
+    }
+}
+
 struct Reminder: Identifiable {
     let id = UUID()
     let title: String
     let subtitle: String
-    let icon: String
-    let iconColor: Color
-    let badgeText: String?
-    let badgeColor: Color?
+    let badge: String
+    let badgeColor: Color
+    let category: ReminderCategory
 }
 
 struct RemindersView: View {
-    let categories = ["All", "Vaccinations", "Grooming", "Deworming", "Medication"]
-    @State private var selectedCategory = "All"
+    @State private var selectedCategory: ReminderCategory = .all
+    
+    let reminders: [Reminder] = [
+        Reminder(title: "Rabies Booster", subtitle: "Due Nov 12", badge: "OVERDUE", badgeColor: .red, category: .vaccinations),
+        Reminder(title: "Full Grooming", subtitle: "9:30 AM", badge: "IN 2 DAYS", badgeColor: .yellow, category: .grooming),
+        Reminder(title: "Heartworm Pill", subtitle: "Every 1st of month", badge: "RECURRING", badgeColor: .gray, category: .medication),
+        Reminder(title: "Flea Treatment", subtitle: "Due Tomorrow", badge: "UPCOMING", badgeColor: .blue, category: .deworming),
+        Reminder(title: "Annual Checkup", subtitle: "Oct 20", badge: "SCHEDULED", badgeColor: .secondary, category: .vaccinations),
+    ]
+    
+    var filteredReminders: [Reminder] {
+        if selectedCategory == .all {
+            return reminders
+        }
+        return reminders.filter { $0.category == selectedCategory }
+    }
     
     var body: some View {
         NavigationStack {
@@ -28,17 +89,13 @@ struct RemindersView: View {
                     // MARK: Category Filter
                     ScrollView(.horizontal, showsIndicators: false) {
                         HStack(spacing: 12) {
-                            ForEach(categories, id: \.self) { category in
-                                if category == "All" {
-                                    // "All" stays as a button to filter the list
-                                    Button(action: { selectedCategory = category }) {
-                                        CategoryPillView(title: category, isSelected: selectedCategory == category)
-                                    }
-                                } else {
-                                    // NavigationLink wrapping a non-button View
-                                    NavigationLink(destination: destinationView(for: category)) {
-                                        CategoryPillView(title: category, isSelected: false)
-                                    }
+                            ForEach(ReminderCategory.allCases, id: \.self) { category in
+                                Button(action: { selectedCategory = category }) {
+                                    CategoryPillView(
+                                        title: category.rawValue,
+                                        isSelected: selectedCategory == category,
+                                        selectedColor: category.selectedPillColor
+                                    )
                                 }
                             }
                         }
@@ -47,57 +104,17 @@ struct RemindersView: View {
                     
                     // MARK: Reminders List
                     VStack(spacing: 16) {
-                        // These show for "All"
-                        ReminderCard(
-                            title: "Rabies Booster",
-                            subtitle: "Due Nov 12 • Luna",
-                            icon: "syringe.fill",
-                            iconBg: Color(.systemBlue).opacity(0.1),
-                            iconColor: .blue,
-                            badge: "OVERDUE",
-                            badgeColor: .red
-                        )
-                        
-                        ReminderCard(
-                            title: "Full Grooming",
-                            subtitle: "9:30 AM • Charlie",
-                            icon: "scissors",
-                            iconBg: Color(.systemOrange).opacity(0.1),
-                            iconColor: .orange,
-                            badge: "IN 2 DAYS",
-                            badgeColor: .orange
-                        )
-                        
-                        ReminderCard(
-                            title: "Heartworm Pill",
-                            subtitle: "Every 1st of month • All Pets",
-                            icon: "pills.fill",
-                            iconBg: Color(.systemRed).opacity(0.1),
-                            iconColor: .red,
-                            badge: "RECURRING",
-                            badgeColor: .gray
-                        )
-                        
-                        // Adding more cards as requested
-                        ReminderCard(
-                            title: "Flea Treatment",
-                            subtitle: "Due Tomorrow • Miso",
-                            icon: "drop.fill",
-                            iconBg: Color(.systemTeal).opacity(0.1),
-                            iconColor: .teal,
-                            badge: "UPCOMING",
-                            badgeColor: .blue
-                        )
-                        
-                        ReminderCard(
-                            title: "Annual Checkup",
-                            subtitle: "Oct 20 • Luna",
-                            icon: "stethoscope",
-                            iconBg: Color(.systemPurple).opacity(0.1),
-                            iconColor: .purple,
-                            badge: "SCHEDULED",
-                            badgeColor: .secondary
-                        )
+                        ForEach(filteredReminders) { reminder in
+                            ReminderCard(
+                                title: reminder.title,
+                                subtitle: reminder.subtitle,
+                                icon: reminder.category.icon,
+                                iconBg: reminder.category.iconBg,
+                                iconColor: reminder.category.iconColor,
+                                badge: reminder.badge,
+                                badgeColor: reminder.badgeColor
+                            )
+                        }
                     }
                     .padding(.horizontal)
                 }
@@ -107,46 +124,36 @@ struct RemindersView: View {
             .navigationTitle("Reminders")
             .navigationBarTitleDisplayMode(.large)
             .toolbar {
-                ToolbarItemGroup(placement: .navigationBarTrailing) {
-                    Button(action: {}) {
-                        Image(systemName: "magnifyingglass")
-                    }
-                    Button(action: {}) {
-                        Image(systemName: "person.circle.fill")
+                ToolbarItemGroup(placement: .navigationBarTrailing) {                    
+                    // MARK: Plus Menu
+                    Menu {
+                        NavigationLink(destination: AddVaccinationView()) {
+                            Label("Vaccination", systemImage: "syringe.fill")
+                        }
+                        NavigationLink(destination: AddGroomingView()) {
+                            Label("Grooming", systemImage: "scissors")
+                        }
+                        NavigationLink(destination: AddDewormingView()) {
+                            Label("Deworming", systemImage: "drop.fill")
+                        }
+                        NavigationLink(destination: AddMedicationView()) {
+                            Label("Medication", systemImage: "pills.fill")
+                        }
+                    } label: {
+                        Image(systemName: "plus")
                     }
                 }
             }
-        }
-    }
-    
-    @ViewBuilder
-    func destinationView(for category: String) -> some View {
-        switch category {
-        case "Vaccinations":
-            AddVaccinationView()
-        case "Grooming":
-            AddGroomingView()
-        case "Deworming":
-            AddDewormingView()
-        case "Medication":
-            AddMedicationView() // Add this line
-        default:
-            VStack {
-                Text("Add \(category) Screen")
-                    .font(.headline)
-            }
-            .navigationTitle(category)
-            .navigationBarTitleDisplayMode(.inline)
         }
     }
 }
 
 // MARK: - Subviews
 
-// Renamed and changed to a simple View (removed the internal Button)
 struct CategoryPillView: View {
     let title: String
     let isSelected: Bool
+    let selectedColor: Color
     
     var body: some View {
         Text(title)
@@ -154,7 +161,7 @@ struct CategoryPillView: View {
             .fontWeight(.medium)
             .padding(.horizontal, 20)
             .padding(.vertical, 10)
-            .background(isSelected ? Color(.systemOrange) : Color(.systemGray5))
+            .background(isSelected ? selectedColor : Color(.systemGray5))
             .foregroundColor(isSelected ? .white : .secondary)
             .clipShape(Capsule())
     }
@@ -181,30 +188,12 @@ struct ReminderCard: View {
             }
             
             VStack(alignment: .leading, spacing: 4) {
-                HStack {
-                    Text(title)
-                        .font(.headline)
-                    
-                    Text(badge)
-                        .font(.caption2.bold())
-                        .padding(.horizontal, 6)
-                        .padding(.vertical, 2)
-                        .background(badgeColor.opacity(0.15))
-                        .foregroundColor(badgeColor)
-                        .cornerRadius(4)
-                }
+                Text(title)
+                    .font(.headline)
                 
                 HStack(spacing: 4) {
-                    if title.contains("Pill") || title.contains("Treatment") {
-                        Image(systemName: "arrow.clockwise")
-                            .font(.caption)
-                    } else if title.contains("Grooming") {
-                        Image(systemName: "clock")
-                            .font(.caption)
-                    } else {
-                        Image(systemName: "calendar")
-                            .font(.caption)
-                    }
+                    Image(systemName: subtitleIcon(for: title))
+                        .font(.caption)
                     Text(subtitle)
                         .font(.subheadline)
                         .foregroundColor(.secondary)
@@ -220,6 +209,16 @@ struct ReminderCard: View {
         .padding()
         .background(Color(.secondarySystemGroupedBackground))
         .cornerRadius(33)
+    }
+    
+    func subtitleIcon(for title: String) -> String {
+        if title.contains("Pill") || title.contains("Treatment") {
+            return "arrow.clockwise"
+        } else if title.contains("Grooming") {
+            return "clock"
+        } else {
+            return "calendar"
+        }
     }
 }
 
