@@ -10,13 +10,7 @@ struct BookingView: View {
     var body: some View {
         NavigationStack {
             ScrollView {
-                VStack(alignment: .leading, spacing: 24) {
-                    
-                    // MARK: Description Header
-                    Text("Select the best care experience for your pet's modern lifestyle.")
-                        .font(.system(.subheadline, design: .rounded))
-                        .foregroundColor(.secondary)
-                        .padding(.horizontal)
+                VStack(alignment: .leading, spacing: 32) {
                     
                     // MARK: Booking Options
                     VStack(spacing: 20) {
@@ -40,6 +34,21 @@ struct BookingView: View {
                     }
                     .padding(.horizontal)
                     
+                    // MARK: Upcoming Bookings Section
+                    VStack(alignment: .leading, spacing: 16) {
+                        Text("Upcoming Bookings")
+                            .font(.system(.title2, design: .rounded).bold())
+                            .padding(.horizontal)
+                        
+                        UpcomingBookingCard(
+                            walkerName: "Riya Sengupta",
+                            time: "Today, 6:00 PM",
+                            service: "Dog Walking",
+                            image: "person.circle.fill"
+                        )
+                        .padding(.horizontal)
+                    }
+                    
                     Spacer(minLength: 40)
                 }
                 .padding(.vertical)
@@ -47,7 +56,69 @@ struct BookingView: View {
             .background(Color(.systemGroupedBackground))
             .navigationTitle("Book a Service")
             .navigationBarTitleDisplayMode(.large)
+            .toolbar {
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    NavigationLink(destination: PastBookingsView()) {
+                        Image(systemName: "clock.arrow.circlepath")
+                            .fontWeight(.semibold)
+                            .foregroundColor(.orange)
+                    }
+                }
+            }
         }
+    }
+}
+
+// MARK: - Subviews
+
+struct UpcomingBookingCard: View {
+    let walkerName: String
+    let time: String
+    let service: String
+    let image: String
+    
+    var body: some View {
+        HStack(spacing: 16) {
+            // Profile Image
+            Image(systemName: image)
+                .resizable()
+                .frame(width: 50, height: 50)
+                .foregroundColor(.gray.opacity(0.4))
+                .background(Circle().fill(Color.white))
+            
+            VStack(alignment: .leading, spacing: 4) {
+                Text(walkerName)
+                    .font(.system(.headline, design: .rounded))
+                
+                Text(service)
+                    .font(.system(.subheadline, design: .rounded))
+                    .foregroundColor(.secondary)
+                
+                HStack(spacing: 4) {
+                    Image(systemName: "clock.fill")
+                        .font(.caption)
+                    Text(time)
+                        .font(.system(.caption, design: .rounded).bold())
+                }
+                .foregroundColor(.orange)
+                .padding(.top, 2)
+            }
+            
+            Spacer()
+            
+            // Status Tag
+            Text("Confirmed")
+                .font(.system(size: 12, weight: .bold, design: .rounded))
+                .foregroundColor(.green)
+                .padding(.horizontal, 12)
+                .padding(.vertical, 6)
+                .background(Color.green.opacity(0.1))
+                .clipShape(Capsule())
+        }
+        .padding()
+        .background(Color(.secondarySystemGroupedBackground))
+        .cornerRadius(24)
+        .shadow(color: Color.black.opacity(0.03), radius: 10, x: 0, y: 5)
     }
 }
 
@@ -97,7 +168,7 @@ struct BookingCardView: View {
         .padding(24)
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(Color(.secondarySystemGroupedBackground))
-        .cornerRadius(24)
+        .cornerRadius(33)
     }
 }
 

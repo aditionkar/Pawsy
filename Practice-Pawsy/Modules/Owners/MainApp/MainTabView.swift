@@ -22,7 +22,7 @@ struct MainTabView: View {
                     Text("Booking")
                 }
             
-            Text("SOS Screen")
+            SOSView()
                 .tabItem {
                     Image(systemName: "star")
                     Text("SOS")

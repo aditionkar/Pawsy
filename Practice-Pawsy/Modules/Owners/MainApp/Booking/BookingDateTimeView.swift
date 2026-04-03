@@ -41,9 +41,9 @@ struct BookingDateTimeView: View {
         }
     }
     
-    @State private var selectedDate: String
+    @State private var selectedDate: String = ""
     @State private var selectedTime = Date()
-    @State private var selectedDuration = "30 min"
+    @State private var selectedDuration = ""
 
     init(serviceTitle: String) {
         self.serviceTitle = serviceTitle
@@ -60,6 +60,11 @@ struct BookingDateTimeView: View {
     var buttonLabel: String {
         serviceTitle.contains("Walk") ? "See Available Walkers" : "See Available Sitters"
     }
+    
+    // Logic to check if all selections are made
+        var isBookingValid: Bool {
+            !selectedDate.isEmpty && !selectedDuration.isEmpty
+        }
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
@@ -144,11 +149,12 @@ struct BookingDateTimeView: View {
                             .foregroundColor(.white)
                             .frame(maxWidth: .infinity)
                             .padding(.vertical, 18)
-                            .background(Color.orange)
+                            .background(isBookingValid ? Color.orange : Color.gray.opacity(0.5))
                             .clipShape(Capsule())
                             .padding(.horizontal, 20)
                             .padding(.bottom, 10)
                         }
+                        .disabled(!isBookingValid)
                         .background(Color(.systemGroupedBackground))
                         .shadow(color: .black.opacity(0.1), radius: 10, x: 0, y: -5)
         }

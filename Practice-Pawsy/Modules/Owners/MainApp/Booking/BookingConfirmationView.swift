@@ -14,6 +14,9 @@ struct BookingConfirmationView: View {
     let selectedDuration: String
     let walkerName: String
     
+    // Environment to handle dismissing the view
+    @Environment(\.dismiss) var dismiss
+    
     @State private var checkmarkValue: CGFloat = 0
     @State private var scaleValue: CGFloat = 0.5
     @State private var opacityValue: Double = 0
@@ -24,7 +27,6 @@ struct BookingConfirmationView: View {
             
             // MARK: Animated Checkmark Header
             ZStack {
-                // Outer glow circles
                 Circle()
                     .fill(Color.orange.opacity(0.1))
                     .frame(width: 160, height: 160)
@@ -35,12 +37,10 @@ struct BookingConfirmationView: View {
                     .frame(width: 200, height: 200)
                     .scaleEffect(scaleValue * 1.1)
 
-                // Main Circle
                 Circle()
                     .fill(Color.orange)
                     .frame(width: 100, height: 100)
                 
-                // Animated Checkmark Path
                 CheckmarkShape()
                     .trim(from: 0, to: checkmarkValue)
                     .stroke(Color.white, style: StrokeStyle(lineWidth: 6, lineCap: .round, lineJoin: .round))
@@ -54,15 +54,13 @@ struct BookingConfirmationView: View {
                     .font(.system(.largeTitle, design: .rounded).bold())
                     .foregroundColor(Color(red: 0.75, green: 0.4, blue: 0.2))
 
-                // Use a single Text with localized string interpolation (iOS 15+)
-                // This is much more efficient than (+)
+                // DYNAMIC DATE FIX: Using selectedDate variable
                 Text("Luna is all set for her outdoor adventure\non ")
                     .font(.system(.body, design: .rounded))
                     .foregroundColor(.secondary)
-                + Text("Tuesday, Oct 24")
+                + Text(selectedDate) // Changed from hardcoded string
                     .font(.system(.body, design: .rounded).bold())
                     .foregroundColor(Color(red: 0.75, green: 0.4, blue: 0.2))
-                // We stop the chain here and start a new one or use interpolation
                 + Text(" at \(selectedTime.formatted(.dateTime.hour().minute()))")
                     .font(.system(.body, design: .rounded).bold())
                     .foregroundColor(Color(red: 0.75, green: 0.4, blue: 0.2))
@@ -98,7 +96,7 @@ struct BookingConfirmationView: View {
                             .font(.caption)
                         Text("4.9")
                             .font(.system(.caption, design: .rounded).bold())
-                        Text("(128 walks)")
+                        Text("(\(Int.random(in: 50...150)) walks)")
                             .font(.system(.caption, design: .rounded))
                             .foregroundColor(.secondary)
                     }
@@ -116,10 +114,9 @@ struct BookingConfirmationView: View {
                 }
             }
             .padding()
-            .background(Color.white)
+            .background(Color(.secondarySystemBackground))
             .cornerRadius(24)
             .padding(.horizontal)
-            .shadow(color: Color.black.opacity(0.05), radius: 10, x: 0, y: 5)
             
             Spacer()
             
@@ -136,7 +133,8 @@ struct BookingConfirmationView: View {
                 }
                 
                 Button(action: {
-                    // Action to go back home
+                    // Logic to return home (Dismissing current navigation stack)
+                    dismiss()
                 }) {
                     Text("Back to Home")
                         .font(.system(.headline, design: .rounded).bold())
@@ -154,9 +152,9 @@ struct BookingConfirmationView: View {
             .padding(.bottom, 20)
         }
         .background(Color(.systemBackground))
-        .navigationBarHidden(true)
+        // Show the navigation bar so the back button is visible
+        .navigationBarHidden(false)
         .onAppear {
-            // Animation sequence
             withAnimation(.spring(response: 0.6, dampingFraction: 0.6, blendDuration: 0)) {
                 scaleValue = 1.0
                 opacityValue = 1.0
