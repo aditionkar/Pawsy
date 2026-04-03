@@ -16,10 +16,10 @@ struct MainTabView: View {
                     Text("Reminders")
                 }
             
-            Text("Walks Screen")
+            BookingView()
                 .tabItem {
                     Image(systemName: "figure.walk")
-                    Text("Walks")
+                    Text("Booking")
                 }
             
             Text("SOS Screen")
