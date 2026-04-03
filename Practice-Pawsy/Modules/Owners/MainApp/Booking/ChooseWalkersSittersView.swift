@@ -43,7 +43,7 @@ struct ChooseWalkersSittersView: View {
                     
                     // MARK: Summary Bar (Now inside ScrollView)
                     HStack {
-                        Label("Today, \(selectedTime.formatted(.dateTime.hour().minute())) · \(selectedDuration)", systemImage: "calendar")
+                        Label("\(selectedDate), \(selectedTime.formatted(.dateTime.hour().minute())) · \(selectedDuration)", systemImage: "calendar")
                             .font(.system(.subheadline, design: .rounded).bold())
                             .foregroundColor(.primary)
                         Spacer()
@@ -162,7 +162,7 @@ struct WalkerCard: View {
         }
         .padding()
         .background(Color(.secondarySystemGroupedBackground))
-        .cornerRadius(24)
+        .cornerRadius(33)
         .overlay(
             RoundedRectangle(cornerRadius: 24)
                 .stroke(isSelected ? Color.orange : Color.clear, lineWidth: 2)
