@@ -9,21 +9,7 @@
 import Supabase
 import Foundation
 
-struct Config {
-    static let supabaseURL: String = {
-        let value = Bundle.main.object(forInfoDictionaryKey: "SUPABASE_URL") as? String
-        print("SUPABASE_URL =", value ?? "nil") // 👈 ADD THIS
-        return value!
-    }()
-
-    static let supabaseKey: String = {
-        let value = Bundle.main.object(forInfoDictionaryKey: "SUPABASE_ANON_KEY") as? String
-        print("SUPABASE_KEY =", value ?? "nil") // 👈 ADD THIS
-        return value!
-    }()
-}
-
 let supabase = SupabaseClient(
-    supabaseURL: URL(string: Config.supabaseURL)!,
-    supabaseKey: Config.supabaseKey
+    supabaseURL: URL(string: "https://ysyzyalaurvzfgcfgcai.supabase.co")!,
+    supabaseKey: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlzeXp5YWxhdXJ2emZnY2ZnY2FpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzUyMTUzNzAsImV4cCI6MjA5MDc5MTM3MH0.DnTPiOEw2lT9C60z_GWGPxlT5WMq2Enu5f5Kmo4lQjk"
 )
