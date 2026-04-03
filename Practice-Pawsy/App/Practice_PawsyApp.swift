@@ -6,10 +6,15 @@
 //
 
 import SwiftUI
+import AppIntents
 
 @main
 struct Practice_PawsyApp: App {
     @StateObject private var authVM = AuthViewModel()
+    
+    init() {
+        PawsyShortcuts.updateAppShortcutParameters()
+    }
 
     var body: some Scene {
         WindowGroup {

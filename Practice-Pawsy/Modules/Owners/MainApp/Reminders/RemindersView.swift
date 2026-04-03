@@ -57,22 +57,22 @@ enum ReminderCategory: String, CaseIterable {
 struct Reminder: Identifiable {
     let id = UUID()
     let title: String
-    let subtitle: String
-    let badge: String
-    let badgeColor: Color
+    let subtitle: String // Used for the "Normal" card display
     let category: ReminderCategory
+    
+    // Detailed View Fields
+    var nextDate: String?
+    var nextTime: String?
+    var previousDate: String?
+    var dosage: String?
+    var frequency: String?
+    var duration: String?
 }
 
 struct RemindersView: View {
     @State private var selectedCategory: ReminderCategory = .all
     
-    let reminders: [Reminder] = [
-        Reminder(title: "Rabies Booster", subtitle: "Due Nov 12", badge: "OVERDUE", badgeColor: .red, category: .vaccinations),
-        Reminder(title: "Full Grooming", subtitle: "9:30 AM", badge: "IN 2 DAYS", badgeColor: .yellow, category: .grooming),
-        Reminder(title: "Heartworm Pill", subtitle: "Every 1st of month", badge: "RECURRING", badgeColor: .gray, category: .medication),
-        Reminder(title: "Flea Treatment", subtitle: "Due Tomorrow", badge: "UPCOMING", badgeColor: .blue, category: .deworming),
-        Reminder(title: "Annual Checkup", subtitle: "Oct 20", badge: "SCHEDULED", badgeColor: .secondary, category: .vaccinations),
-    ]
+    var reminders: [Reminder] { ReminderStore.shared.reminders }
     
     var filteredReminders: [Reminder] {
         if selectedCategory == .all {
@@ -90,14 +90,14 @@ struct RemindersView: View {
                     ScrollView(.horizontal, showsIndicators: false) {
                         HStack(spacing: 12) {
                             ForEach(ReminderCategory.allCases, id: \.self) { category in
-                                Button(action: { selectedCategory = category }) {
-                                    CategoryPillView(
-                                        title: category.rawValue,
-                                        isSelected: selectedCategory == category,
-                                        selectedColor: category.selectedPillColor
-                                    )
-                                }
-                            }
+                                                        Button(action: { selectedCategory = category }) {
+                                                            CategoryPillView(
+                                                                title: category.rawValue,
+                                                                isSelected: selectedCategory == category,
+                                                                selectedColor: category.selectedPillColor
+                                                            )
+                                                        }
+                                                    }
                         }
                         .padding(.horizontal)
                     }
@@ -110,10 +110,12 @@ struct RemindersView: View {
                                 subtitle: reminder.subtitle,
                                 icon: reminder.category.icon,
                                 iconBg: reminder.category.iconBg,
-                                iconColor: reminder.category.iconColor,
-                                badge: reminder.badge,
-                                badgeColor: reminder.badgeColor
+                                iconColor: reminder.category.iconColor
                             )
+                            .contextMenu {
+                                // This creates the floating detail view on long press
+                                DetailedReminderView(reminder: reminder)
+                            }
                         }
                     }
                     .padding(.horizontal)
@@ -173,8 +175,6 @@ struct ReminderCard: View {
     let icon: String
     let iconBg: Color
     let iconColor: Color
-    let badge: String
-    let badgeColor: Color
     
     var body: some View {
         HStack(spacing: 16) {
@@ -218,6 +218,57 @@ struct ReminderCard: View {
             return "clock"
         } else {
             return "calendar"
+        }
+    }
+}
+
+struct DetailedReminderView: View {
+    let reminder: Reminder
+    
+    var body: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Text(reminder.title)
+                .font(.headline)
+                .foregroundColor(.primary)
+            
+            Divider()
+            
+            Group {
+                detailRow(label: "Next Date", value: reminder.nextDate)
+                detailRow(label: "Time", value: reminder.nextTime)
+                
+                switch reminder.category {
+                case .vaccinations, .deworming:
+                    detailRow(label: "Previous Date", value: reminder.previousDate)
+                    if reminder.category == .deworming {
+                        detailRow(label: "Dosage", value: reminder.dosage)
+                    }
+                    
+                case .medication:
+                    detailRow(label: "Dosage", value: reminder.dosage)
+                    detailRow(label: "Frequency", value: reminder.frequency)
+                    
+                case .grooming:
+                    detailRow(label: "Duration", value: reminder.duration)
+                    detailRow(label: "Frequency", value: reminder.frequency)
+                    
+                case .all: EmptyView()
+                }
+            }
+        }
+        .padding()
+        .frame(width: 250) // Standard context menu width
+    }
+    
+    @ViewBuilder
+    func detailRow(label: String, value: String?) -> some View {
+        if let value = value {
+            HStack {
+                Text(label).foregroundColor(.secondary)
+                Spacer()
+                Text(value).fontWeight(.medium)
+            }
+            .font(.subheadline)
         }
     }
 }
