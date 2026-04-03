@@ -1,21 +1,34 @@
-//
-//  MainTabView.swift
-//  Pawsy
-//
-//  Created by user@37 on 02/04/26.
-//
-
 import SwiftUI
 
 struct MainTabView: View {
     var body: some View {
-        VStack {
-            Image(systemName: "globe")
-                .imageScale(.large)
-                .foregroundStyle(.tint)
-            Text("Hello!")
+        TabView {
+            
+            Text("Home Screen")
+                .tabItem {
+                    Image(systemName: "house")
+                    Text("Home")
+                }
+            
+            RemindersView()
+                .tabItem {
+                    Image(systemName: "bell")
+                    Text("Reminders")
+                }
+            
+            Text("Walks Screen")
+                .tabItem {
+                    Image(systemName: "figure.walk")
+                    Text("Walks")
+                }
+            
+            Text("SOS Screen")
+                .tabItem {
+                    Image(systemName: "star")
+                    Text("SOS")
+                }
         }
-        .padding()
+        .tint(.orange) 
     }
 }
 
