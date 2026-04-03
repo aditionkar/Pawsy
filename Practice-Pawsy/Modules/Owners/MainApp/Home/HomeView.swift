@@ -21,6 +21,12 @@ struct HomeView: View {
         Reminder(title: "Full Grooming", subtitle: "9:30 AM", badge: "IN 2 DAYS", badgeColor: .yellow, category: .grooming),
         Reminder(title: "Heartworm Pill", subtitle: "Every 1st of month", badge: "RECURRING", badgeColor: .gray, category: .medication),
     ]
+    
+    let suggestions: [Suggestion] = [
+        Suggestion(icon: "dog.walker", title: "Take your dog for a walk", subtitle: "30 min walk • 2 km away", color: .blue, action: "walk"),
+        Suggestion(icon: "clock.badge.checkmark", title: "Short on time?", subtitle: "Book a pet walker", color: .orange, action: "book"),
+        Suggestion(icon: "house.fill", title: "Busy for a day?", subtitle: "Book a pet sitter", color: .purple, action: "sitter")
+    ]
 
     var body: some View {
         NavigationStack {
@@ -61,22 +67,35 @@ struct HomeView: View {
                             .padding(.horizontal)
                         }
                     }
+                    
+                    // MARK: Need a Hand?
+                    VStack(alignment: .leading, spacing: 16) {
+                        HStack {
+                            Text("Need a Hand? 🐾")
+                                .font(.system(size: 20, weight: .semibold, design: .rounded))
+                                .foregroundColor(.primary)
+                            Spacer()
+                        }
+                        .padding(.horizontal)
+                        
+                        // Horizontal scroll of square cards
+                        ScrollView(.horizontal, showsIndicators: false) {
+                            HStack(spacing: 16) {
+                                ForEach(suggestions) { suggestion in
+                                    SquareSuggestionCard(suggestion: suggestion)
+                                }
+                            }
+                            .padding(.horizontal)
+                        }
+                    }
                 }
                 .padding(.top, 16)
                 .padding(.bottom, 32)
             }
             .background(Color(.systemGroupedBackground))
-            .navigationBarTitleDisplayMode(.inline)
+            .navigationTitle("Hey, \(ownerName) 👋")
+            
             .toolbar {
-                // Greeting — left
-                ToolbarItem(placement: .navigationBarLeading) {
-                    VStack(alignment: .leading, spacing: 1) {
-                        Text("Hey, \(ownerName) 👋")
-                            .font(.system(size: 20, weight: .bold, design: .rounded))
-                            .foregroundColor(.primary)
-                    }
-                }
-
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Menu {
                         Button(role: .destructive) {
@@ -87,7 +106,7 @@ struct HomeView: View {
                             Label("Logout", systemImage: "rectangle.portrait.and.arrow.right")
                         }
                     } label: {
-                        Image(systemName: "ellipsis.circle") // The "eclipse" (ellipsis) symbol
+                        Image(systemName: "ellipsis.circle")
                             .font(.title3)
                             .foregroundColor(.orange)
                     }
@@ -95,6 +114,69 @@ struct HomeView: View {
             }
         }
     }
+}
+
+// MARK: - Square Suggestion Card
+
+struct SquareSuggestionCard: View {
+    let suggestion: Suggestion
+    @State private var isPressed = false
+    
+    var body: some View {
+        Button(action: {
+            // Handle suggestion action
+            print("Tapped: \(suggestion.action)")
+        }) {
+            VStack(spacing: 16) {
+                // Icon
+                ZStack {
+                    RoundedRectangle(cornerRadius: 20)
+                        .fill(suggestion.color.opacity(0.15))
+                        .frame(width: 60, height: 60)
+                    Image(systemName: suggestion.icon)
+                        .font(.system(size: 32))
+                        .foregroundColor(suggestion.color)
+                }
+                
+                // Text
+                VStack(spacing: 8) {
+                    Text(suggestion.title)
+                        .font(.system(size: 16, weight: .semibold, design: .rounded))
+                        .foregroundColor(.primary)
+                        .multilineTextAlignment(.center)
+                        .fixedSize(horizontal: false, vertical: true)
+                    
+                    Text(suggestion.subtitle)
+                        .font(.system(size: 13, weight: .regular, design: .rounded))
+                        .foregroundColor(.secondary)
+                        .multilineTextAlignment(.center)
+                }
+                
+                Spacer(minLength: 0)
+            }
+            .padding(20)
+            .frame(width: 180, height: 180)
+            .background(Color(.secondarySystemGroupedBackground))
+            .clipShape(RoundedRectangle(cornerRadius: 33))
+            .scaleEffect(isPressed ? 0.96 : 1.0)
+            .animation(.spring(response: 0.3, dampingFraction: 0.6), value: isPressed)
+        }
+        .buttonStyle(PlainButtonStyle())
+        .onLongPressGesture(minimumDuration: 0.01, pressing: { pressing in
+            isPressed = pressing
+        }, perform: {})
+    }
+}
+
+// MARK: - Suggestion Model
+
+struct Suggestion: Identifiable {
+    let id = UUID()
+    let icon: String
+    let title: String
+    let subtitle: String
+    let color: Color
+    let action: String
 }
 
 // MARK: - Pet Card
