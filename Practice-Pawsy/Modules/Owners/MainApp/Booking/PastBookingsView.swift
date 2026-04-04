@@ -17,9 +17,9 @@ struct PastBookingRecord: Identifiable {
 
 struct PastBookingsView: View {
     let pastBookings = [
-        PastBookingRecord(walkerName: "Aman Gupta", date: "Mar 28, 2026", service: "Dog Walking", amount: "$25.00"),
-        PastBookingRecord(walkerName: "Sana Sheikh", date: "Mar 22, 2026", service: "Pet Sitting", amount: "$45.00"),
-        PastBookingRecord(walkerName: "Riya Sengupta", date: "Mar 15, 2026", service: "Dog Walking", amount: "$25.00")
+        PastBookingRecord(walkerName: "Aman Gupta", date: "Mar 28, 2026", service: "Dog Walking", amount: "₹450"),
+        PastBookingRecord(walkerName: "Sana Sheikh", date: "Mar 22, 2026", service: "Pet Sitting", amount: "₹250"),
+        PastBookingRecord(walkerName: "Riya Sengupta", date: "Mar 15, 2026", service: "Dog Walking", amount: "₹600")
     ]
     
     var body: some View {

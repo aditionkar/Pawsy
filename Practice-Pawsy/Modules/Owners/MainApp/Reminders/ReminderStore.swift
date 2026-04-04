@@ -11,12 +11,18 @@ class ReminderStore {
     static let shared = ReminderStore()
     
     var reminders: [Reminder] = [
-        Reminder(title: "Rabies Booster", subtitle: "Nov 12", category: .vaccinations,
-                 nextDate: "Nov 12, 2026", nextTime: "10:00 AM", previousDate: "Nov 12, 2025"),
-        Reminder(title: "Full Grooming", subtitle: "9:30 AM", category: .grooming,
-                 nextDate: "Tomorrow", previousDate: "Nov 12, 2025", frequency: "Monthly", duration: "2 hours"),
+        Reminder(title: "Rabies Booster", subtitle: "June 12", category: .vaccinations,
+                 nextDate: "June 12, 2026", nextTime: "10:00 AM", previousDate: "June 12, 2025"),
+        Reminder(title: "Leptospirosis", subtitle: "Aug 3", category: .vaccinations,
+                 nextDate: "Aug 3, 2025", nextTime: "9:00 AM", previousDate: "Aug 3, 2025"),
+        Reminder(title: "Leptospirosis", subtitle: "May 14", category: .vaccinations,
+                 nextDate: "May 14, 2025", nextTime: "8:00 AM", previousDate: "May 14, 2025"),
+        Reminder(title: "Nails Trim", subtitle: "9:30 AM", category: .grooming,
+                 nextDate: "Tomorrow", previousDate: "Jan 23, 2025", frequency: "Monthly", duration: "30 minutes"),
+        Reminder(title: "Haircut", subtitle: "10:30 AM", category: .grooming,
+                 nextDate: "Apr 10, 2025", previousDate: "Nov 12, 2025", frequency: "Monthly", duration: "2 hours"),
         Reminder(title: "Heartworm Pill", subtitle: "Every 1st", category: .medication,
-                 nextTime: "08:00 AM", previousDate: "Nov 12, 2025", dosage: "1 Tablet", frequency: "Monthly"),
+                 nextTime: "08:00 AM", previousDate: "March 16, 2025", dosage: "1 Tablet", frequency: "Monthly"),
         Reminder(title: "Flea Treatment", subtitle: "Due Tomorrow", category: .deworming,
                  nextDate: "April 4", previousDate: "March 4", dosage: "0.5ml")
     ]
