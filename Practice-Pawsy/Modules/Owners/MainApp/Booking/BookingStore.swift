@@ -43,6 +43,7 @@ enum BookingStatus: String, Codable {
     case confirmed = "Confirmed"
     case completed = "Completed"
     case cancelled = "Cancelled"
+    case ongoing = "Ongoing"
 }
 
 // MARK: - BookingStore

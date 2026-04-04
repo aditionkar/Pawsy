@@ -19,12 +19,12 @@ struct BookingDateTimeView: View {
             let dayLabel: String
             
             switch offset {
-            case 0: dayLabel = "TODAY"
-            case 1: dayLabel = "TOM"
+            case 0: dayLabel = "Today"
+            case 1: dayLabel = "Tom"
             default:
                 let formatter = DateFormatter()
                 formatter.dateFormat = "EEE" // e.g., "FRI"
-                dayLabel = formatter.string(from: date).uppercased()
+                dayLabel = formatter.string(from: date)
             }
             
             let numFormatter = DateFormatter()
@@ -36,7 +36,7 @@ struct BookingDateTimeView: View {
             return (
                 day: dayLabel,
                 num: numFormatter.string(from: date),
-                month: monthFormatter.string(from: date).uppercased()
+                month: monthFormatter.string(from: date)
             )
         }
     }
@@ -112,7 +112,7 @@ struct BookingDateTimeView: View {
                         .padding(.horizontal, 20)
                         .padding(.vertical, 12)
                         .background(Color(.secondarySystemGroupedBackground))
-                        .cornerRadius(20)
+                        .cornerRadius(33)
                     }
                     
                     // MARK: Duration
@@ -184,7 +184,7 @@ struct DateSelectionCard: View {
             .frame(maxWidth: .infinity) // KEY CHANGE: Removes fixed width, allows expansion
             .frame(height: 105)
             .background(isSelected ? Color.orange : Color(.secondarySystemGroupedBackground))
-            .cornerRadius(24)
+            .cornerRadius(33)
         }
     }
 }

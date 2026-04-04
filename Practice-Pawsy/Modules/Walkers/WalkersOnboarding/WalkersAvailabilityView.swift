@@ -121,7 +121,7 @@ struct DayOnlyCard: View {
                 .foregroundColor(isSelected ? .white : .primary)
                 .frame(width: 70, height: 70)
                 .background(isSelected ? Color.orange : Color(uiColor: .secondarySystemGroupedBackground))
-                .cornerRadius(20)
+                .cornerRadius(35)
         }
     }
 }

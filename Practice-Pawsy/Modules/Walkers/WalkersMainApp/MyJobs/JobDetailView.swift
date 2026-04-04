@@ -22,12 +22,13 @@ struct JobDetailView: View {
                     // MARK: - Pet Detail Card
                     VStack(alignment: .leading, spacing: 15) {
                         HStack(spacing: 15) {
-                            Image(systemName: job.petImageName)
+                            Image(job.petImageName)
                                 .resizable()
-                                .aspectRatio(contentMode: .fill)
-                                .frame(width: 80, height: 80)
+                                .scaledToFill() // Ensures the photo fills the frame
+                                .frame(width: 50, height: 50) // Slightly larger for better visibility
                                 .background(Color(.systemGray6))
-                                .cornerRadius(20)
+                                .clipShape(RoundedRectangle(cornerRadius: 15))
+                                .clipped()
                             
                             VStack(alignment: .leading, spacing: 5) {
                                 Text(job.petName)
