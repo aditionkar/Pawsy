@@ -6,68 +6,82 @@
 //
 
 import SwiftUI
+internal import Auth
 
 struct HomeView: View {
     @EnvironmentObject var authViewModel: AuthViewModel
    
-    let ownerName = "Rahul"
     let petName = "Buddy"
     let petBreed = "Golden Retriever"
-    let petAge = "2 years"
+    let petAge = "2 years • 32 Kg"
     let petImage: UIImage? = nil
 
     let todayReminders: [Reminder] = [
-        // Vaccinations: vaccine name, next date/time, and previous date
-        Reminder(
-            title: "Rabies Booster",
-            subtitle: "Due Nov 12",
-            category: .vaccinations,
-            nextDate: "Nov 12, 2026",
-            nextTime: "11:00 AM",
-            previousDate: "Nov 10, 2023"
-        ),
         
         // Grooming: service name, duration, date, and frequency
         Reminder(
-            title: "Full Grooming",
+            title: "Nails Trim",
             subtitle: "9:30 AM",
             category: .grooming,
-            nextDate: "April 5, 2026",
-            nextTime: "9:30 AM",
+            nextDate: "April 4, 2026",
+            nextTime: "6:30 pM",
             frequency: "Monthly",
-            duration: "2.5 hours"
+            duration: "30 minutes"
         ),
         
         // Medication: medicine name, dosage, frequency, and next date/time
         Reminder(
             title: "Heartworm Pill",
-            subtitle: "Every 1st of month",
+            subtitle: "Every 4th of month",
             category: .medication,
-            nextDate: "May 1, 2026",
-            nextTime: "08:00 AM",
+            nextDate: "May 4, 2026",
+            nextTime: "05:00 PM",
             dosage: "1 Tablet (25mg)",
             frequency: "Monthly"
         )
     ]
 
     let suggestions: [Suggestion] = [
-        Suggestion(icon: "dog.walker", title: "Take your dog for a walk", subtitle: "30 min walk • 2 km away", color: .blue, action: "walk"),
-        Suggestion(icon: "clock.badge.checkmark", title: "Short on time?", subtitle: "Book a pet walker", color: .orange, action: "book"),
+        Suggestion(icon: "pawprint", title: "Take your dog for a walk", subtitle: "Book a pet walker", color: .blue, action: "walk"),
         Suggestion(icon: "house.fill", title: "Busy for a day?", subtitle: "Book a pet sitter", color: .purple, action: "sitter")
     ]
+    
+    // MARK: - Computed Properties
+    
+    // Extract first name from email
+    var ownerName: String {
+        guard let email = authViewModel.currentUser?.email else {
+            return "Pet Parent"
+        }
+        
+        // Get the part before @
+        let emailPrefix = email.split(separator: "@").first?.lowercased() ?? ""
+        
+        // Split by common separators and take first part
+        let nameParts = emailPrefix.split { $0 == "." || $0 == "_" || $0 == "-" }
+        
+        if let firstName = nameParts.first {
+            return firstName.capitalized
+        }
+        
+        return emailPrefix.capitalized
+    }
 
     var body: some View {
         NavigationStack {
             ScrollView(showsIndicators: false) {
                 VStack(alignment: .leading, spacing: 24) {
 
-                    // MARK: Pet Card
-                    PetCardView(
-                        petName: petName,
-                        petBreed: petBreed,
-                        petAge: petAge,
-                        petImage: petImage
-                    )
+                    // MARK: Pet Card (Now Navigates to PetProfileView)
+                    NavigationLink(destination: PetProfileView()) {
+                        PetCardView(
+                            petName: petName,
+                            petBreed: petBreed,
+                            petAge: petAge,
+                            petImage: petImage
+                        )
+                    }
+                    .buttonStyle(PlainButtonStyle())
                     .padding(.horizontal)
 
                     // MARK: Today's Summary
@@ -134,7 +148,7 @@ struct HomeView: View {
                             Label("Logout", systemImage: "rectangle.portrait.and.arrow.right")
                         }
                     } label: {
-                        Image(systemName: "ellipsis.circle")
+                        Image(systemName: "ellipsis")
                             .font(.title3)
                             .foregroundColor(.orange)
                     }
@@ -183,7 +197,7 @@ struct SquareSuggestionCard: View {
                 Spacer(minLength: 0)
             }
             .padding(20)
-            .frame(width: 180, height: 180)
+            .frame(width: 177, height: 177)
             .background(Color(.secondarySystemGroupedBackground))
             .clipShape(RoundedRectangle(cornerRadius: 33))
             .scaleEffect(isPressed ? 0.96 : 1.0)
@@ -230,9 +244,11 @@ struct PetCardView: View {
                         .frame(width: 80, height: 80)
                         .clipShape(RoundedRectangle(cornerRadius: 20))
                 } else {
-                    Image(systemName: "dog.fill")
-                        .font(.system(size: 32))
-                        .foregroundColor(Color(.systemOrange).opacity(0.6))
+                    Image("dog1")
+                        .resizable()
+                        .scaledToFill()
+                        .frame(width: 80, height: 80)
+                        .clipShape(RoundedRectangle(cornerRadius: 20))
                 }
             }
 
@@ -259,17 +275,10 @@ struct PetCardView: View {
 
             Spacer()
 
-            // Arrow
-            Button(action: {}) {
-                ZStack {
-                    Circle()
-                        .fill(Color(.secondarySystemGroupedBackground))
-                        .frame(width: 36, height: 36)
-                    Image(systemName: "chevron.right")
-                        .font(.system(size: 13, weight: .semibold))
-                        .foregroundColor(Color(.systemOrange))
-                }
-            }
+            // Arrow indicator
+            Image(systemName: "chevron.right")
+                .font(.system(size: 13, weight: .semibold))
+                .foregroundColor(Color(.systemOrange))
         }
         .padding(20)
         .background(Color(.secondarySystemGroupedBackground))
@@ -300,7 +309,6 @@ struct HomeReminderRow: View {
                 Text(reminder.title)
                     .font(.system(size: 16, weight: .semibold, design: .rounded))
                     .foregroundColor(isDone ? .secondary : .primary)
-                    .strikethrough(isDone, color: .secondary)
 
                 HStack(spacing: 4) {
                     Image(systemName: "calendar")
@@ -362,4 +370,5 @@ struct EmptySummaryView: View {
 
 #Preview {
     HomeView()
+        .environmentObject(AuthViewModel())
 }

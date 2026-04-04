@@ -55,19 +55,23 @@ struct PawsyShortcuts: AppShortcutsProvider {
             intent: UpcomingMedicationIntent(),
             phrases: [
                 "Show upcoming medications in \(.applicationName)",
-                "Tell me medication reminders in \(.applicationName)"
+                "Tell me medication reminders in \(.applicationName)",
+                "What medicines do I have to give my dog today in \(.applicationName)",
+                "What medications does my dog need today in \(.applicationName)"
             ],
             shortTitle: "Upcoming Medications",
             systemImageName: "pills.fill"
         )
+        
+        // MARK: Grooming
         AppShortcut(
-            intent: PastMedicationIntent(),
+            intent: UpcomingGroomingIntent(),
             phrases: [
-                "Show past medications in \(.applicationName)",
-                "Tell me previous medication records in \(.applicationName)"
+                "Show upcoming grooming in \(.applicationName)",
+                "Tell me grooming appointments in \(.applicationName)"
             ],
-            shortTitle: "Past Medications",
-            systemImageName: "clock.arrow.circlepath"
+            shortTitle: "Upcoming Grooming",
+            systemImageName: "scissors"
         )
     }
 }

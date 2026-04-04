@@ -16,12 +16,14 @@ class AuthViewModel: ObservableObject {
     @Published var userRole: String? = nil
     @Published var authError: String? = nil
     @Published var isNewUser = false
-
+    @Published var currentUser: User?  // ← ADD THIS LINE
+    
     // MARK: - Session Restore
     func getInitialSession() async {
         do {
             let current = try await supabase.auth.session
             self.session = current
+            self.currentUser = current.user  // ← ADD THIS LINE
             self.isAuthenticated = true
             await fetchRole(userId: current.user.id)
         } catch {
@@ -37,6 +39,7 @@ class AuthViewModel: ObservableObject {
             
             // Use result.user directly — session may be nil if email confirmation is on
             let userId = result.user.id
+            self.currentUser = result.user  // ← ADD THIS LINE
 
             struct UserInsert: Encodable {
                 let id: UUID
@@ -66,6 +69,7 @@ class AuthViewModel: ObservableObject {
         do {
             let result = try await supabase.auth.signIn(email: email, password: password)
             self.session = result
+            self.currentUser = result.user  // ← ADD THIS LINE
             self.isNewUser = false
             self.isAuthenticated = true
             await fetchRole(userId: result.user.id)
@@ -98,6 +102,7 @@ class AuthViewModel: ObservableObject {
         do {
             try await supabase.auth.signOut()
             self.session = nil
+            self.currentUser = nil  // ← ADD THIS LINE
             self.isAuthenticated = false
             self.userRole = nil
         } catch {
@@ -105,8 +110,7 @@ class AuthViewModel: ObservableObject {
         }
     }
     
-    // Inside AuthViewModel.swift
-
+    // MARK: - Complete Onboarding
     func completeOnboarding() {
         self.isNewUser = false
     }
