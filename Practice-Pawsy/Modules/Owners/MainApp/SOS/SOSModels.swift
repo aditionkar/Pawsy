@@ -1,52 +1,58 @@
 //
 //  SOSModels.swift
-//  Practice-Pawsy
-//
-//  Created by admin20 on 03/04/26.
-//
-
-//
-//  SOSModels.swift
 //  Pawsy
 //
 
-import SwiftUI
-
-// MARK: - SOSRoute
-enum SOSRoute: Hashable {
-    case loading([String])
-    case results(RiskLevel, [EvidenceItem])
-    case pastChecks
-}
-
-// MARK: - RiskLevel
-enum RiskLevel: Hashable {
-    case low, moderate, severe
-
+import Foundation
+import SwiftUI 
+enum RiskLevel: String, CaseIterable {
+    case low = "Low"
+    case moderate = "Moderate"
+    case severe = "Severe"
+    
+    var color: String {
+        switch self {
+        case .low: return "green"
+        case .moderate: return "yellow"
+        case .severe: return "red"
+        }
+    }
+    
+    var recommendation: String {
+        switch self {
+        case .low:
+            return "Monitor at home. Schedule a vet visit if symptoms persist."
+        case .moderate:
+            return "Book a vet appointment within 24-48 hours."
+        case .severe:
+            return "Seek immediate veterinary care!"
+        }
+    }
+    
     var title: String {
         switch self {
-        case .low: return "No Risk"
+        case .low: return "Low Risk"
         case .moderate: return "Moderate Risk"
         case .severe: return "Severe Risk"
         }
     }
-
+    
     var alertLabel: String {
         switch self {
-        case .low: return "Green Alert Level"
-        case .moderate: return "Yellow Alert Level"
-        case .severe: return "Red Alert Level"
+        case .low: return "Mild symptoms detected"
+        case .moderate: return "Monitor closely"
+        case .severe: return "Urgent care recommended"
         }
     }
-
+    
     var icon: String {
         switch self {
         case .low: return "checkmark.circle.fill"
         case .moderate: return "exclamationmark.triangle.fill"
-        case .severe: return "xmark.octagon.fill"
+        case .severe: return "cross.case.fill"
         }
     }
-
+    
     var iconColor: Color {
         switch self {
         case .low: return .green
@@ -54,68 +60,62 @@ enum RiskLevel: Hashable {
         case .severe: return .red
         }
     }
-
+    
     var accentColor: Color {
         switch self {
-        case .low: return Color(.systemGreen).opacity(0.1)
-        case .moderate: return Color(.systemOrange).opacity(0.1)
-        case .severe: return Color(.systemRed).opacity(0.1)
+        case .low: return Color.green.opacity(0.1)
+        case .moderate: return Color.orange.opacity(0.1)
+        case .severe: return Color.red.opacity(0.1)
         }
     }
-
-    var accentBorderColor: Color {
-        switch self {
-        case .low: return Color(.systemGreen).opacity(0.35)
-        case .moderate: return Color(.systemOrange).opacity(0.35)
-        case .severe: return Color(.systemRed).opacity(0.35)
-        }
-    }
-
+    
     var accentForeground: Color {
         switch self {
-        case .low: return Color(.systemGreen)
-        case .moderate: return Color(.systemOrange)
-        case .severe: return Color(.systemRed)
+        case .low: return .green
+        case .moderate: return .orange
+        case .severe: return .red
         }
     }
-
+    
+    var accentBorderColor: Color {
+        switch self {
+        case .low: return Color.green.opacity(0.3)
+        case .moderate: return Color.orange.opacity(0.3)
+        case .severe: return Color.red.opacity(0.3)
+        }
+    }
+    
     var diagnosisText: String {
         switch self {
-        case .low: return "Your pet seems fine"
-        case .moderate: return "May be a mild digestive issue"
-        case .severe: return "Immediate attention required"
+        case .low: return "Mild Condition"
+        case .moderate: return "Moderate Condition"
+        case .severe: return "Critical Condition"
         }
     }
-
+    
     var carePlanTitle: String {
         switch self {
-        case .low: return "Home Care Recommended"
-        case .moderate: return "Consult a vet soon"
-        case .severe: return "Visit a vet immediately"
+        case .low: return "Rest & Monitor"
+        case .moderate: return "Vet Visit Recommended"
+        case .severe: return "Emergency Care Needed"
         }
     }
-
+    
     var carePlanDescription: String {
         switch self {
-        case .low: return "Monitor your pet at home. Ensure they stay hydrated and comfortable. Check in again if symptoms worsen."
-        case .moderate: return "We recommend a professional check-up within the next 12–24 hours to prevent further complications."
-        case .severe: return "Your pet needs urgent veterinary care. Please visit a vet clinic right away."
+        case .low:
+            return "Provide plenty of water and rest. Monitor for 24 hours."
+        case .moderate:
+            return "Schedule a vet appointment within 24-48 hours."
+        case .severe:
+            return "Take your pet to an emergency vet immediately!"
         }
     }
 }
 
-// MARK: - EvidenceItem
-struct EvidenceItem: Identifiable, Hashable {
-    let id = UUID()
-    let icon: String
-    let title: String
-    let description: String
-
-    static func == (lhs: EvidenceItem, rhs: EvidenceItem) -> Bool {
-        lhs.id == rhs.id
-    }
-
-    func hash(into hasher: inout Hasher) {
-        hasher.combine(id)
-    }
+enum SOSRoute: Hashable {
+    case details([String])
+    case results(RiskLevel, [String])
+    case pastChecks
+    case loading(symptoms: [String], duration: String, appetite: String, energy: String)
 }

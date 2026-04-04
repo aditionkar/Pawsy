@@ -106,7 +106,7 @@ struct PetWeightView: View {
             Spacer()
 
             Button(action: onDone) {
-                Text("Done")
+                Text("Next")
                     .font(.system(size: 17, weight: .semibold, design: .rounded))
                     .foregroundColor(.white)
                     .padding(.horizontal, 48)

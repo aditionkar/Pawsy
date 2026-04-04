@@ -12,38 +12,8 @@ struct PastCheck: Identifiable {
     let symptoms: [String]
     let summary: String
 
-    var evidenceItems: [EvidenceItem] {
-        symptoms.map { symptom in
-            EvidenceItem(
-                icon: iconForSymptom(symptom),
-                title: "\(symptom) detected",
-                description: descriptionForSymptom(symptom)
-            )
-        }
-    }
-
-    private func iconForSymptom(_ symptom: String) -> String {
-        switch symptom {
-        case "Not eating": return "fork.knife"
-        case "Vomiting": return "pills"
-        case "Low energy": return "battery.25"
-        case "Diarrhea": return "drop.triangle"
-        case "Excessive barking": return "megaphone"
-        case "Limping": return "figure.walk"
-        default: return "exclamationmark.circle"
-        }
-    }
-
-    private func descriptionForSymptom(_ symptom: String) -> String {
-        switch symptom {
-        case "Not eating": return "Loss of appetite reported for this session."
-        case "Vomiting": return "Stomach upset or nausea indicated."
-        case "Low energy": return "Activity levels appear lower than normal."
-        case "Diarrhea": return "Loose stools or digestive discomfort reported."
-        case "Excessive barking": return "Unusual vocalization may indicate discomfort."
-        case "Limping": return "Mobility issue or pain in limbs detected."
-        default: return "Additional symptom flagged for review."
-        }
+    var evidenceStrings: [String] {
+        return symptoms
     }
 }
 
@@ -54,19 +24,19 @@ struct PastChecksView: View {
         PastCheck(
             date: Calendar.current.date(from: DateComponents(year: 2024, month: 10, day: 24))!,
             riskLevel: .low,
-            symptoms: ["Low energy", "Not eating"],
+            symptoms: ["low energy", "loss of appetite"],
             summary: "All vitals are within normal range. Pet showed playful behavior and healthy gum..."
         ),
         PastCheck(
             date: Calendar.current.date(from: DateComponents(year: 2024, month: 9, day: 12))!,
             riskLevel: .moderate,
-            symptoms: ["Vomiting", "Diarrhea", "Low energy"],
+            symptoms: ["vomiting", "diarrhea", "lethargy"],
             summary: "Mild digestive issue detected. Symptoms consistent with dietary intolerance..."
         ),
         PastCheck(
             date: Calendar.current.date(from: DateComponents(year: 2024, month: 8, day: 3))!,
             riskLevel: .severe,
-            symptoms: ["Limping", "Excessive barking"],
+            symptoms: ["limping", "excessive barking"],
             summary: "Signs of acute pain detected in hind leg. Immediate veterinary attention was advised..."
         )
     ]
@@ -80,7 +50,7 @@ struct PastChecksView: View {
                 VStack(spacing: 14) {
                     ForEach(pastChecks) { check in
                         Button(action: {
-                            path.append(SOSRoute.results(check.riskLevel, check.evidenceItems))
+                            path.append(SOSRoute.results(check.riskLevel, check.evidenceStrings))
                         }) {
                             PastCheckCard(check: check)
                         }
@@ -159,7 +129,7 @@ struct PastCheckCard: View {
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: 8) {
                     ForEach(check.symptoms, id: \.self) { symptom in
-                        Text(symptom)
+                        Text(symptom.capitalized)
                             .font(.system(size: 13, weight: .medium, design: .rounded))
                             .foregroundColor(Color(.systemOrange))
                             .padding(.horizontal, 14)
@@ -195,5 +165,5 @@ struct PastCheckCard: View {
 }
 
 #Preview {
-    SOSView()
+    PastChecksView(path: .constant(NavigationPath()))
 }

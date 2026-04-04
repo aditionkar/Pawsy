@@ -136,14 +136,14 @@ struct RequestCardView: View {
             
             VStack(spacing: 15) {
                 HStack {
-                    InfoItem(label: "DATE", value: request.date)
+                    InfoItem(label: "Date", value: request.date)
                     Spacer()
-                    InfoItem(label: "TIME", value: request.time)
+                    InfoItem(label: "Time", value: request.time)
                 }
                 HStack {
-                    InfoItem(label: "DURATION", value: request.duration)
+                    InfoItem(label: "Duration", value: request.duration)
                     Spacer()
-                    InfoItem(label: "DISTANCE", value: request.distance)
+                    InfoItem(label: "Distance", value: request.distance)
                 }
             }
             
@@ -184,10 +184,10 @@ struct InfoItem: View {
             Text(label)
                 .font(.caption)
                 .foregroundColor(.secondary)
-                .fontWeight(.bold)
+                .fontWeight(.medium)
             Text(value)
                 .font(.body)
-                .fontWeight(.bold)
+                .fontWeight(.medium)
         }
         .frame(minWidth: 100, alignment: .leading)
     }
