@@ -8,67 +8,65 @@
 import SwiftUI
 
 struct WalkerOrSitterView: View {
-    @Environment(\.dismiss) var dismiss
-    @State private var selectedOption: String? = "Pet Walker" // Default selection
+    @Binding var selectedOption: String?
+    let onNext: () -> Void
     
     var body: some View {
-        NavigationStack {
-            ZStack(alignment: .bottom) {
-                Color(uiColor: .systemGroupedBackground).ignoresSafeArea()
+        ScrollView {
+            VStack(alignment: .leading, spacing: 30) {
                 
-                ScrollView {
-                    VStack(alignment: .leading, spacing: 30) {
-                        
-                        Text("How do you want to help?")
-                            .font(.system(size: 28, weight: .bold))
-                            .padding(.top, 20)
-                            .padding(.horizontal)
-                        
-                        VStack(spacing: 20) {
-                            SelectionCard(
-                                title: "Pet Walker",
-                                subtitle: "Take dogs out for scheduled walks.",
-                                icon: "figure.walk",
-                                isSelected: selectedOption == "Pet Walker"
-                            ) {
-                                selectedOption = "Pet Walker"
-                            }
-                            
-                            SelectionCard(
-                                title: "Pet Sitter",
-                                subtitle: "Stay with pets at their home for the day.",
-                                icon: "house.fill",
-                                isSelected: selectedOption == "Pet Sitter"
-                            ) {
-                                selectedOption = "Pet Sitter"
-                            }
-                        }
-                        .padding(.horizontal)
-                        
-                        Spacer(minLength: 120)
+                Text("How do you want to help?")
+                    .font(.system(size: 28, weight: .bold))
+                    .padding(.top, 20)
+                    .padding(.horizontal)
+                
+                VStack(spacing: 20) {
+                    SelectionCard(
+                        title: "Pet Walker",
+                        subtitle: "Take dogs out for scheduled walks.",
+                        icon: "figure.walk",
+                        isSelected: selectedOption == "Pet Walker"
+                    ) {
+                        selectedOption = "Pet Walker"
+                    }
+                    
+                    SelectionCard(
+                        title: "Pet Sitter",
+                        subtitle: "Stay with pets at their home for the day.",
+                        icon: "house.fill",
+                        isSelected: selectedOption == "Pet Sitter"
+                    ) {
+                        selectedOption = "Pet Sitter"
                     }
                 }
-                
-                // MARK: - Navigation Button
-                Button(action: { /* Action to next screen */ }) {
-                    Text("Continue")
-                        .font(.headline)
-                        .foregroundColor(.white)
-                        .frame(maxWidth: .infinity)
-                        .frame(height: 55)
-                        .background(selectedOption == nil ? Color.gray.opacity(0.5) : Color.orange)
-                        .cornerRadius(33)
-                        .padding(.horizontal, 20)
-                        .padding(.bottom, 20)
-                }
-                .disabled(selectedOption == nil)
+                .padding(.horizontal)
             }
+            .padding(.bottom, 40)
+        }
+        .safeAreaInset(edge: .bottom) {
+            Button(action: onNext) {
+                Text("Next")
+                    .font(.system(size: 17, weight: .semibold, design: .rounded))
+                    .foregroundColor(.white)
+                    .padding(.horizontal, 48)
+                    .padding(.vertical, 16)
+                    .background(Color(.systemOrange))
+                    .clipShape(Capsule())
+            }
+            .disabled(selectedOption == nil)
+            .background(
+                LinearGradient(
+                    gradient: Gradient(colors: [Color(.systemGroupedBackground).opacity(0), Color(.systemGroupedBackground)]),
+                    startPoint: .top,
+                    endPoint: .bottom
+                )
+                .frame(height: 100)
+            )
         }
     }
 }
 
-// MARK: - Custom Selection Card Component
-
+// MARK: - Supporting Components (Keep as is)
 struct SelectionCard: View {
     let title: String
     let subtitle: String
@@ -80,7 +78,6 @@ struct SelectionCard: View {
         Button(action: action) {
             VStack(alignment: .leading, spacing: 20) {
                 HStack(alignment: .top) {
-                    // Icon Container
                     Image(systemName: icon)
                         .font(.title2)
                         .foregroundColor(.orange)
@@ -90,7 +87,6 @@ struct SelectionCard: View {
                     
                     Spacer()
                     
-                    // Custom Radio Button
                     ZStack {
                         Circle()
                             .stroke(isSelected ? Color.orange : Color.gray.opacity(0.3), lineWidth: 2)
@@ -124,10 +120,10 @@ struct SelectionCard: View {
             )
         }
         .buttonStyle(PlainButtonStyle())
-        .animation(.spring(), value: isSelected)
     }
 }
 
-#Preview {
-    WalkerOrSitterView()
-}
+
+//#Preview {
+//    WalkerOrSitterView()
+//}

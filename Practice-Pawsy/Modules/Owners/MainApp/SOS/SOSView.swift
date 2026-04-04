@@ -10,37 +10,45 @@ struct Symptom: Identifiable, Hashable {
     let title: String
     let subtitle: String
     let systemImage: String
-    let isOther: Bool
 }
 
 struct SOSView: View {
     @State private var path = NavigationPath()
     @State private var selectedSymptoms = Set<UUID>()
-    @State private var otherSymptomText = ""
 
     private let symptoms = [
-        Symptom(title: "Not eating", subtitle: "Loss of appetite", systemImage: "fork.knife", isOther: false),
-        Symptom(title: "Vomiting", subtitle: "Stomach upset", systemImage: "pills", isOther: false),
-        Symptom(title: "Low energy", subtitle: "Lethargy or weakness", systemImage: "battery.25", isOther: false),
-        Symptom(title: "Diarrhea", subtitle: "Loose stools", systemImage: "drop.triangle", isOther: false),
-        Symptom(title: "Excessive barking", subtitle: "Unusual vocalization", systemImage: "megaphone", isOther: false),
-        Symptom(title: "Limping", subtitle: "Mobility issues", systemImage: "figure.walk", isOther: false)
+        Symptom(title: "Vomiting", subtitle: "Stomach upset", systemImage: "pills"),
+        Symptom(title: "Diarrhea", subtitle: "Loose stools", systemImage: "drop.triangle"),
+        Symptom(title: "Lethargy", subtitle: "Low energy", systemImage: "battery.25"),
+        Symptom(title: "Appetite loss", subtitle: "Not eating well", systemImage: "fork.knife"),  // ← Changed
+        Symptom(title: "Coughing", subtitle: "Respiratory issue", systemImage: "lungs"),
+        Symptom(title: "Fever", subtitle: "High body temperature", systemImage: "thermometer"),
+        Symptom(title: "Lameness", subtitle: "Mobility issue", systemImage: "figure.walk"),  // ← Changed from "Limping"
+        Symptom(title: "Nasal discharge", subtitle: "Runny nose", systemImage: "nose"),
+        Symptom(title: "Eye discharge", subtitle: "Eye irritation", systemImage: "eye")
     ]
 
-    private let columns = [GridItem(.flexible(), spacing: 12), GridItem(.flexible(), spacing: 12)]
+    private let columns = [
+        GridItem(.flexible(), spacing: 12),
+        GridItem(.flexible(), spacing: 12)
+    ]
 
     var selectedSymptomTitles: [String] {
-        symptoms.filter { selectedSymptoms.contains($0.id) }.map { $0.title }
+        symptoms
+            .filter { selectedSymptoms.contains($0.id) }
+            .map { $0.title.lowercased() }
     }
 
     var body: some View {
         NavigationStack(path: $path) {
             ZStack(alignment: .bottom) {
+
                 Color(.systemGroupedBackground)
                     .ignoresSafeArea()
 
                 ScrollView(showsIndicators: false) {
                     VStack(spacing: 20) {
+
                         Text("What symptoms is your pet showing?")
                             .font(.system(size: 16, weight: .regular, design: .rounded))
                             .foregroundColor(.secondary)
@@ -51,11 +59,14 @@ struct SOSView: View {
                         LazyVGrid(columns: columns, spacing: 12) {
                             ForEach(symptoms) { symptom in
                                 Button(action: { toggleSymptom(symptom) }) {
+
                                     VStack(alignment: .leading, spacing: 10) {
+
                                         ZStack {
                                             Circle()
                                                 .fill(Color(.systemGroupedBackground))
                                                 .frame(width: 48, height: 48)
+
                                             Image(systemName: symptom.systemImage)
                                                 .font(.title2)
                                                 .foregroundColor(Color(.systemOrange))
@@ -68,7 +79,6 @@ struct SOSView: View {
                                         Text(symptom.subtitle)
                                             .font(.system(size: 13, weight: .regular, design: .rounded))
                                             .foregroundColor(.secondary)
-                                            .fixedSize(horizontal: false, vertical: true)
                                     }
                                     .padding(14)
                                     .frame(maxWidth: .infinity, alignment: .leading)
@@ -77,29 +87,17 @@ struct SOSView: View {
                                     .overlay(
                                         RoundedRectangle(cornerRadius: 33)
                                             .strokeBorder(
-                                                selectedSymptoms.contains(symptom.id) ? Color(.systemOrange) : Color.clear,
+                                                selectedSymptoms.contains(symptom.id)
+                                                ? Color(.systemOrange)
+                                                : Color.clear,
                                                 lineWidth: 2
                                             )
                                     )
                                 }
+                                .buttonStyle(.plain)
                             }
                         }
                         .padding(.horizontal)
-
-                        VStack(alignment: .leading, spacing: 10) {
-                            Text("Other")
-                                .font(.system(size: 15, weight: .semibold, design: .rounded))
-                                .foregroundColor(.primary)
-                                .padding(.horizontal)
-
-                            TextField("Describe another symptom...", text: $otherSymptomText)
-                                .font(.system(size: 16, weight: .regular, design: .rounded))
-                                .padding(.horizontal, 20)
-                                .padding(.vertical, 18)
-                                .background(Color(.secondarySystemGroupedBackground))
-                                .clipShape(Capsule())
-                                .padding(.horizontal)
-                        }
 
                         Spacer(minLength: 100)
                     }
@@ -108,7 +106,7 @@ struct SOSView: View {
 
                 VStack {
                     Button(action: {
-                        path.append(SOSRoute.loading(selectedSymptomTitles))
+                        path.append(SOSRoute.details(selectedSymptomTitles))
                     }) {
                         Text("Continue")
                             .font(.system(size: 17, weight: .semibold, design: .rounded))
@@ -117,7 +115,6 @@ struct SOSView: View {
                             .background(selectedSymptoms.isEmpty ? Color(.systemGray4) : Color(.systemOrange))
                             .foregroundColor(.white)
                             .clipShape(Capsule())
-                            .animation(.easeInOut(duration: 0.2), value: selectedSymptoms.isEmpty)
                     }
                     .disabled(selectedSymptoms.isEmpty)
                     .padding(.horizontal, 28)
@@ -128,26 +125,23 @@ struct SOSView: View {
             }
             .navigationTitle("SOS")
             .navigationBarTitleDisplayMode(.large)
-            .toolbar {
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    Button(action: { path.append(SOSRoute.pastChecks) }) {
-                        Image(systemName: "chart.line.uptrend.xyaxis")
-                            .font(.system(size: 15, weight: .medium, design: .rounded))
-                            .foregroundColor(Color(.systemOrange))
-                            .padding(8)
-                            .background(Color(.secondarySystemGroupedBackground))
-                            .clipShape(Circle())
-                    }
-                }
-            }
+
             .navigationDestination(for: SOSRoute.self) { route in
                 switch route {
-                case .loading(let symptoms):
-                    LoadingAnimationView(selectedSymptoms: symptoms, path: $path)
+                case .details(let symptoms):
+                    DetailsView(symptoms: symptoms, path: $path)
                 case .results(let riskLevel, let evidence):
                     SOSResultsView(riskLevel: riskLevel, evidenceItems: evidence, path: $path)
                 case .pastChecks:
                     PastChecksView(path: $path)
+                case .loading(let symptoms, let duration, let appetite, let energy):
+                    LoadingAnimationView(
+                        selectedSymptoms: symptoms,
+                        duration: duration,
+                        appetite: appetite,
+                        energy: energy,
+                        path: $path
+                    )
                 }
             }
         }

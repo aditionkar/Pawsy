@@ -39,11 +39,8 @@ struct JobDetailView: View {
                                     .foregroundColor(.secondary)
                                 
                                 HStack {
-                                    Image(systemName: "scalemass.fill")
-                                        .foregroundColor(.brown)
                                     Text(job.weight)
                                         .font(.subheadline)
-                                        .fontWeight(.medium)
                                 }
                             }
                             Spacer()
@@ -56,7 +53,7 @@ struct JobDetailView: View {
                     // MARK: - Payout & Info Grid
                     HStack(spacing: 15) {
                         VStack(alignment: .leading) {
-                            Text("TOTAL PAYOUT")
+                            Text("Total Payout")
                                 .font(.caption)
                                 .fontWeight(.bold)
                                 .foregroundColor(.white.opacity(0.8))
@@ -79,22 +76,22 @@ struct JobDetailView: View {
                         .cornerRadius(33)
                         
                         VStack(spacing: 12) {
-                            InfoSmallCard(title: "SERVICE", value: job.duration, icon: "pawprint.fill", color: job.statusColor.opacity(0.3))
-                            InfoSmallCard(title: "DATE", value: job.date, icon: nil, color: Color(.systemGray5))
+                            InfoSmallCard(title: "Service", value: job.duration, icon: "pawprint.fill", color: job.statusColor.opacity(0.3))
+                            InfoSmallCard(title: "Date", value: job.date, icon: nil, color: Color(.systemGray5))
                         }
                         .frame(maxWidth: .infinity)
                     }
 
                     // MARK: - Time & Address Section
                     VStack(alignment: .leading, spacing: 20) {
-                        DetailRow(icon: "clock.fill", label: "PREFERRED TIME", value: job.time)
+                        DetailRow(icon: "clock.fill", label: "Preferred Time", value: job.time)
 
                         Button(action: { openInMaps() }) {
                             VStack(alignment: .leading, spacing: 10) {
-                                DetailRow(icon: "mappin.circle.fill", label: "ADDRESS", value: job.address)
+                                DetailRow(icon: "mappin.circle.fill", label: "Address", value: job.address)
                                 
                                 if job.statusColor != .gray {
-                                    Text("Address will be revealed once accepted")
+                                    Text("Open maps to get the directions of the owner's house")
                                         .font(.caption)
                                         .foregroundColor(.brown)
                                         .fontWeight(.semibold)
@@ -174,7 +171,7 @@ struct InfoSmallCard: View {
                 }
                 Text(value)
                     .font(.subheadline)
-                    .fontWeight(.bold)
+                    .fontWeight(.medium)
             }
         }
         .padding()
@@ -205,7 +202,7 @@ struct DetailRow: View {
                     .foregroundColor(.secondary)
                 Text(value)
                     .font(.headline)
-                    .fontWeight(.bold)
+                    .fontWeight(.medium)
             }
         }
     }

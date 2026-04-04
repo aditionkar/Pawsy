@@ -8,107 +8,129 @@
 import SwiftUI
 
 struct WalkersOnboardingView: View {
-    // 1. Manage the current step (0 to 2)
     @State private var currentStep = 0
+    let totalSteps = 3
     @State private var isOnboardingComplete = false
+    
+    // Walker-specific state variables
+    @State private var selectedOption: String? = nil
+    @State private var fullName: String = ""
+    @State private var phone: String = ""
+    @State private var city: String = ""
+    @State private var selectedDays: Set<String> = []
+    @State private var fromTime = Calendar.current.date(from: DateComponents(hour: 8, minute: 0)) ?? Date()
+    @State private var toTime = Calendar.current.date(from: DateComponents(hour: 18, minute: 30)) ?? Date()
+    @State private var isAvailableOnShortNotice = true
+    
     @EnvironmentObject var authVM: AuthViewModel
     
     var body: some View {
         if isOnboardingComplete {
-            // Replace this with your actual TabView file
-            Text("WalkersMainTabView")
-                .font(.largeTitle)
+            WalkersMainTabView()
         } else {
-            NavigationStack {
-                ZStack(alignment: .top) {
-                    Color(uiColor: .systemGroupedBackground).ignoresSafeArea()
+            ZStack(alignment: .top) {
+                Color(.systemGroupedBackground)
+                    .ignoresSafeArea()
+                
+                VStack(spacing: 0) {
                     
-                    VStack(spacing: 0) {
-                        // 2. Custom Progress Bar
-                        OnboardingProgressBar(progress: Double(currentStep + 1) / 3.0)
-                            .padding(.top, 10)
-                        
-                        // 3. Dynamic View Switcher
-                        Group {
-                            switch currentStep {
-                            case 0:
-                                WalkerOrSitterView()
-                            case 1:
-                                WalkersDetailsView()
-                            case 2:
-                                WalkersAvailabilityView()
-                            default:
-                                EmptyView()
+                    // MARK: Progress Bar + Back Button
+                    if currentStep < totalSteps {
+                        ZStack(alignment: .topLeading) {
+                            
+                            HStack {
+                                Spacer()
+                                GeometryReader { geo in
+                                    ZStack(alignment: .leading) {
+                                        Capsule()
+                                            .fill(Color(.secondarySystemGroupedBackground))
+                                            .frame(height: 8)
+                                        
+                                        Capsule()
+                                            .fill(Color(.systemOrange))
+                                            .frame(
+                                                width: geo.size.width * CGFloat(currentStep + 1) / CGFloat(totalSteps),
+                                                height: 8
+                                            )
+                                            .animation(.easeInOut(duration: 0.3), value: currentStep)
+                                    }
+                                }
+                                .frame(height: 8)
+                                Spacer()
                             }
-                        }
-                        .transition(.asymmetric(
-                            insertion: .move(edge: .trailing).combined(with: .opacity),
-                            removal: .move(edge: .leading).combined(with: .opacity)
-                        ))
-                    }
-                    
-                    // 4. Overlay "Continue" Logic
-                    // Note: You can either put the button here or keep it inside the subviews.
-                    // For a smooth flow, let's add a global "Next" trigger logic.
-                }
-                .navigationBarTitleDisplayMode(.inline)
-                .toolbar {
-                    ToolbarItem(placement: .navigationBarLeading) {
-                        if currentStep > 0 {
-                            Button(action: {
-                                withAnimation(.spring()) { currentStep -= 1 }
-                            }) {
+                            .padding(.horizontal, 64)
+                            .padding(.top, 20)
+                            
+                            Button(action: { if currentStep > 0 { currentStep -= 1 } }) {
                                 Image(systemName: "chevron.left")
-                                    .fontWeight(.bold)
-                                    .foregroundColor(.orange)
+                                    .font(.system(size: 14, weight: .semibold, design: .rounded))
+                                    .foregroundColor(Color(.systemOrange))
+                                    .frame(width: 36, height: 36)
+                                    .background(
+                                        Circle()
+                                            .fill(Color(.secondarySystemGroupedBackground))
+                                    )
                             }
+                            .opacity(currentStep > 0 ? 1 : 0)
+                            .disabled(currentStep == 0)
+                            .padding(.leading, 20)
+                            .padding(.top, 8)
                         }
+                        .frame(height: 52)
                     }
                     
-                    ToolbarItem(placement: .navigationBarTrailing) {
-                        Button("Next") {
-                            advanceStep()
+                    // MARK: Step Views
+                    Group {
+                        switch currentStep {
+                        case 0:
+                            WalkerOrSitterView(
+                                selectedOption: $selectedOption,
+                                onNext: { withAnimation { currentStep = 1 } }
+                            )
+                        case 1:
+                            WalkersDetailsView(
+                                fullName: $fullName,
+                                phone: $phone,
+                                city: $city,
+                                onNext: { withAnimation { currentStep = 2 } }
+                            )
+                        case 2:
+                            WalkersAvailabilityView(
+                                selectedDays: $selectedDays,
+                                fromTime: $fromTime,
+                                toTime: $toTime,
+                                isAvailableOnShortNotice: $isAvailableOnShortNotice,
+                                onComplete: {
+                                    withAnimation {
+                                        isOnboardingComplete = true
+                                        authVM.completeOnboarding()
+                                    }
+                                }
+                            )
+                        default:
+                            EmptyView()
                         }
-                        .fontWeight(.bold)
-                        .foregroundColor(.orange)
                     }
+                    .transition(.asymmetric(
+                        insertion: .move(edge: .trailing).combined(with: .opacity),
+                        removal: .move(edge: .leading).combined(with: .opacity)
+                    ))
                 }
-            }
-        }
-    }
-    
-    private func advanceStep() {
-        withAnimation(.spring()) {
-            if currentStep < 2 {
-                currentStep += 1
-            } else {
-                authVM.completeOnboarding()
             }
         }
     }
 }
 
-// MARK: - Custom Progress Bar Component
-struct OnboardingProgressBar: View {
-    var progress: Double // Value between 0 and 1
-    
-    var body: some View {
-        ZStack(alignment: .leading) {
-            Capsule()
-                .frame(maxWidth: .infinity)
-                .frame(height: 8)
-                .foregroundColor(Color.orange.opacity(0.1))
-            
-            Capsule()
-                .frame(width: UIScreen.main.bounds.width * CGFloat(progress) - 40)
-                .frame(height: 8)
-                .foregroundColor(.orange)
-                .animation(.spring(), value: progress)
-        }
-        .padding(.horizontal, 20)
-    }
-}
+
+// MARK: - Updated WalkerOrSitterView
+
+
+// MARK: - Updated WalkersDetailsView
+
+
+// MARK: - Updated WalkersAvailabilityView
 
 #Preview {
     WalkersOnboardingView()
+        .environmentObject(AuthViewModel())
 }

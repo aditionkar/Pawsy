@@ -7,8 +7,58 @@ import SwiftUI
 
 struct SOSResultsView: View {
     let riskLevel: RiskLevel
-    let evidenceItems: [EvidenceItem]
+    let evidenceItems: [String]
     @Binding var path: NavigationPath
+
+    private func iconForSymptom(_ symptom: String) -> String {
+        switch symptom.lowercased() {
+        case "not eating", "loss of appetite", "appetite loss":
+            return "fork.knife"
+        case "vomiting":
+            return "pills"
+        case "lethargy", "low energy":
+            return "battery.25"
+        case "diarrhea":
+            return "drop.triangle"
+        case "coughing":
+            return "lungs"
+        case "fever":
+            return "thermometer"
+        case "limping", "lameness":
+            return "figure.walk"
+        case "nasal discharge":
+            return "nose"
+        case "eye discharge":
+            return "eye"
+        default:
+            return "exclamationmark.circle"
+        }
+    }
+    
+    private func descriptionForSymptom(_ symptom: String) -> String {
+        switch symptom.lowercased() {
+        case "not eating", "loss of appetite", "appetite loss":
+            return "Loss of appetite reported for this session."
+        case "vomiting":
+            return "Stomach upset or nausea indicated."
+        case "lethargy", "low energy":
+            return "Activity levels appear lower than normal."
+        case "diarrhea":
+            return "Loose stools or digestive discomfort reported."
+        case "coughing":
+            return "Respiratory issue or irritation detected."
+        case "fever":
+            return "Elevated body temperature detected."
+        case "limping", "lameness":
+            return "Mobility issue or pain in limbs detected."
+        case "nasal discharge":
+            return "Nasal congestion or discharge present."
+        case "eye discharge":
+            return "Eye irritation or infection indicated."
+        default:
+            return "Additional symptom flagged for review."
+        }
+    }
 
     var body: some View {
         ZStack {
@@ -85,23 +135,23 @@ struct SOSResultsView: View {
                             .kerning(1.2)
 
                         VStack(spacing: 0) {
-                            ForEach(Array(evidenceItems.enumerated()), id: \.element.id) { index, item in
+                            ForEach(Array(evidenceItems.enumerated()), id: \.offset) { index, symptom in
                                 HStack(alignment: .top, spacing: 12) {
                                     ZStack {
                                         RoundedRectangle(cornerRadius: 10)
                                             .fill(Color(.systemOrange).opacity(0.12))
                                             .frame(width: 36, height: 36)
-                                        Image(systemName: item.icon)
+                                        Image(systemName: iconForSymptom(symptom))
                                             .font(.system(size: 15, weight: .medium))
                                             .foregroundColor(Color(.systemOrange))
                                     }
 
                                     VStack(alignment: .leading, spacing: 3) {
-                                        Text(item.title)
+                                        Text(symptom.capitalized)
                                             .font(.system(size: 15, weight: .semibold, design: .rounded))
                                             .foregroundColor(.primary)
 
-                                        Text(item.description)
+                                        Text(descriptionForSymptom(symptom))
                                             .font(.system(size: 13, weight: .regular, design: .rounded))
                                             .foregroundColor(.secondary)
                                             .fixedSize(horizontal: false, vertical: true)
@@ -165,5 +215,9 @@ struct SOSResultsView: View {
 }
 
 #Preview {
-    SOSView()
+    SOSResultsView(
+        riskLevel: .severe,
+        evidenceItems: ["Vomiting", "Lethargy", "Loss of appetite"],
+        path: .constant(NavigationPath())
+    )
 }

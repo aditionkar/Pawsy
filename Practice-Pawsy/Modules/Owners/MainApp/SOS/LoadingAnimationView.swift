@@ -7,26 +7,14 @@ import SwiftUI
 
 struct LoadingAnimationView: View {
     let selectedSymptoms: [String]
+    let duration: String
+    let appetite: String
+    let energy: String
     @Binding var path: NavigationPath
 
     @State private var progress: CGFloat = 0
     @State private var pulseScale: CGFloat = 1.0
-
-    var simulatedRiskLevel: RiskLevel {
-        if selectedSymptoms.count >= 4 { return .severe }
-        if selectedSymptoms.count >= 2 { return .moderate }
-        return .low
-    }
-
-    var simulatedEvidence: [EvidenceItem] {
-        selectedSymptoms.map { symptom in
-            EvidenceItem(
-                icon: iconForSymptom(symptom),
-                title: "\(symptom) detected",
-                description: descriptionForSymptom(symptom)
-            )
-        }
-    }
+    @State private var predictionCompleted = false
 
     var body: some View {
         ZStack {
@@ -88,38 +76,53 @@ struct LoadingAnimationView: View {
         .onAppear {
             pulseScale = 1.12
             progress = 1.0
-            DispatchQueue.main.asyncAfter(deadline: .now() + 2.6) {
-                path.removeLast()
-                path.append(SOSRoute.results(simulatedRiskLevel, simulatedEvidence))
+            
+            // Call REAL ML Model
+            DispatchQueue.global(qos: .userInitiated).async {
+                let result = SOSMLService.shared.predictRisk(
+                    symptoms: selectedSymptoms.joined(separator: ", "),
+                    duration: duration,
+                    appetite: appetite,
+                    energy: energy
+                )
+                
+                DispatchQueue.main.async {
+                    let riskLevel = mapToRiskLevel(result.label)
+                    print("✅ REAL ML Prediction: \(result.label) with confidence: \(String(format: "%.2f", result.confidence))")
+                    print("📊 Symptoms: \(selectedSymptoms)")
+                    print("⏱️ Duration: \(duration)")
+                    print("🍽️ Appetite: \(appetite)")
+                    print("⚡ Energy: \(energy)")
+                    
+                    // Navigate to results with REAL prediction
+                    path.removeLast()
+                    path.append(SOSRoute.results(riskLevel, selectedSymptoms))
+                    predictionCompleted = true
+                }
             }
         }
     }
-
-    private func iconForSymptom(_ symptom: String) -> String {
-        switch symptom {
-        case "Not eating": return "fork.knife"
-        case "Vomiting": return "pills"
-        case "Low energy": return "battery.25"
-        case "Diarrhea": return "drop.triangle"
-        case "Excessive barking": return "megaphone"
-        case "Limping": return "figure.walk"
-        default: return "exclamationmark.circle"
-        }
-    }
-
-    private func descriptionForSymptom(_ symptom: String) -> String {
-        switch symptom {
-        case "Not eating": return "Loss of appetite reported for this session."
-        case "Vomiting": return "Stomach upset or nausea indicated."
-        case "Low energy": return "Activity levels appear lower than normal."
-        case "Diarrhea": return "Loose stools or digestive discomfort reported."
-        case "Excessive barking": return "Unusual vocalization may indicate discomfort."
-        case "Limping": return "Mobility issue or pain in limbs detected."
-        default: return "Additional symptom flagged for review."
+    
+    private func mapToRiskLevel(_ label: String) -> RiskLevel {
+        switch label {
+        case "low":
+            return .low
+        case "moderate":
+            return .moderate
+        case "high":
+            return .severe
+        default:
+            return .moderate
         }
     }
 }
 
 #Preview {
-    SOSView()
+    LoadingAnimationView(
+        selectedSymptoms: ["vomiting", "lethargy"],
+        duration: "2 days",
+        appetite: "low",
+        energy: "low",
+        path: .constant(NavigationPath())
+    )
 }

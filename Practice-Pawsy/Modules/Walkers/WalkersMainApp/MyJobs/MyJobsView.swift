@@ -88,7 +88,7 @@ struct MyJobsView: View {
                 Color(uiColor: .systemGroupedBackground).ignoresSafeArea()
                 
                 ScrollView {
-                    VStack(alignment: .leading, spacing: 25) {
+                    VStack(alignment: .leading, spacing: 20) {
                         
                         // Custom Picker
                         Picker("Job Status", selection: $selectedTab) {
@@ -96,13 +96,14 @@ struct MyJobsView: View {
                         }
                         .pickerStyle(.segmented)
                         .padding(.horizontal)
+                        .padding(.bottom, 5)
                         
-                        Text(selectedTab == "Confirmed" ? "UPCOMING SCHEDULE" : "COMPLETED JOBS")
-                            .font(.caption)
-                            .fontWeight(.bold)
-                            .foregroundColor(.secondary)
-                            .padding(.horizontal)
-                            .tracking(1.2)
+//                        Text(selectedTab == "Confirmed" ? "UPCOMING SCHEDULE" : "COMPLETED JOBS")
+//                            .font(.caption)
+//                            .fontWeight(.bold)
+//                            .foregroundColor(.secondary)
+//                            .padding(.horizontal)
+//                            .tracking(1.2)
 
                         ForEach(selectedTab == "Confirmed" ? confirmedJobs : pastJobs) { job in
                             NavigationLink(destination: JobDetailView(job: job)) {

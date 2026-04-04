@@ -21,18 +21,18 @@ struct WalkersProfileView: View {
                         
                         // MARK: - Header Section
                         VStack(spacing: 8) {
-                            Text("JS")
+                            Text("DG")
                                 .font(.system(size: 32, weight: .bold))
                                 .frame(width: 100, height: 100)
                                 .background(Color.orange.opacity(0.2))
                                 .foregroundColor(.brown)
                                 .clipShape(RoundedRectangle(cornerRadius: 25))
                             
-                            Text("Julianne Smith")
+                            Text("Dhruva Gulaty")
                                 .font(.title)
                                 .fontWeight(.bold)
                             
-                            Text("SAN FRANCISCO, CA")
+                            Text("Chennai, Tamil Nadu")
                                 .font(.subheadline)
                                 .fontWeight(.semibold)
                                 .foregroundColor(.secondary)
@@ -156,11 +156,11 @@ struct AvailabilityRow: View {
     var body: some View {
         HStack {
             Text(days)
-                .fontWeight(.bold)
+                .fontWeight(.medium)
             Spacer()
             Text(time)
                 .font(.caption)
-                .fontWeight(.bold)
+                .fontWeight(.semibold)
                 .foregroundColor(.orange.opacity(0.8))
         }
     }
