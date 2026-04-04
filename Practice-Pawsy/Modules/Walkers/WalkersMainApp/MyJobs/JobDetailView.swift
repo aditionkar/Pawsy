@@ -222,8 +222,8 @@ struct DetailRow: View {
             statusColor: .orange,
             breed: "Golden Retriever",
             weight: "28 kg",
-            payout: "$42.00",
-            tip: "$5.00"
+            payout: "₹150",
+            tip: "₹30"
         ))
     }
 }

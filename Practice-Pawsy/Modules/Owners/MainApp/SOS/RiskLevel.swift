@@ -211,6 +211,7 @@ struct SOSResultsView: View {
                 }
             }
         }
+        .toolbar(.hidden, for: .tabBar)
     }
 }
 
