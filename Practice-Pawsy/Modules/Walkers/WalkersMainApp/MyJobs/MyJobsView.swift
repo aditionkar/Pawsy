@@ -40,12 +40,12 @@ struct MyJobsView: View {
             time: "5:00 PM",
             duration: "45 min",
             address: "DC Block, Sector 1, Bidhannagar, Kolkata",
-            petImageName: "dog.fill",
+            petImageName: "dog4", // UPDATED: Asset Name
             statusColor: .orange,
             breed: "Golden Retriever",
             weight: "28 kg",
-            payout: "$42.00",
-            tip: "$5.00"
+            payout: "₹150",
+            tip: "₹30"
         ),
         JobRecord(
             petName: "Luna",
@@ -54,13 +54,13 @@ struct MyJobsView: View {
             date: "Tomorrow",
             time: "8:00 AM",
             duration: "30 min",
-            address: "Plot No. 140 & 151, GST Road, Vallancherry Village, Guduvanchery, Chennai",
-            petImageName: "cat.fill",
+            address: "GST Road, Guduvanchery, Chennai",
+            petImageName: "dog3", // UPDATED: Asset Name
             statusColor: .orange,
             breed: "Siamese Cat",
             weight: "4.5 kg",
-            payout: "$25.00",
-            tip: "$3.00"
+            payout: "₹100",
+            tip: "₹30"
         )
     ]
 
@@ -72,13 +72,13 @@ struct MyJobsView: View {
             date: "Oct 24, 2023",
             time: "2:00 PM",
             duration: "2 hours",
-            address: "Plot No. 140 & 151, GST Road, Vallancherry Village, Guduvanchery, Chennai",
-            petImageName: "pawprint.fill",
+            address: "GST Road, Guduvanchery, Chennai",
+            petImageName: "dog2", // UPDATED: Asset Name
             statusColor: .gray,
             breed: "Indie Cat",
             weight: "5 kg",
-            payout: "$60.00",
-            tip: "$10.00"
+            payout: "₹450",
+            tip: "₹50"
         )
     ]
 
@@ -146,18 +146,19 @@ struct JobCard: View {
             
             // Main Content
             HStack(spacing: 15) {
-                // Pet Image
-                Image(systemName: job.petImageName)
+                // UPDATED: Now fetching assets instead of SystemName
+                Image(job.petImageName)
                     .resizable()
-                    .aspectRatio(contentMode: .fit)
-                    .frame(width: 40, height: 40)
-                    .padding(12)
+                    .scaledToFill() // Ensures the photo fills the frame
+                    .frame(width: 50, height: 50) // Slightly larger for better visibility
                     .background(Color(.systemGray6))
                     .clipShape(RoundedRectangle(cornerRadius: 15))
+                    .clipped()
                 
                 VStack(alignment: .leading, spacing: 4) {
                     Text(job.petName)
                         .font(.headline)
+                        .foregroundColor(.primary)
                     
                     Text("Owner: \(job.ownerName)")
                         .font(.caption)
@@ -177,6 +178,7 @@ struct JobCard: View {
                 Text(job.address)
                     .font(.caption)
                     .foregroundColor(.primary.opacity(0.7))
+                    .lineLimit(1) // Keep the card height consistent
                 Spacer()
                 Image(systemName: "chevron.right")
                     .font(.caption2)

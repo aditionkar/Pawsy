@@ -9,7 +9,7 @@ import SwiftUI
 
 struct PetRequest: Identifiable {
     let id = UUID()
-    let initials: String
+    let imageName: String
     let name: String
     let breed: String
     let tag: String
@@ -24,15 +24,18 @@ struct RequestsView: View {
     @EnvironmentObject var authViewModel: AuthViewModel
     
     @State private var requests = [
-        PetRequest(initials: "JS", name: "Cooper", breed: "Golden Retriever", tag: "WALK", date: "Oct 24, 2023", time: "02:30 PM", duration: "45 Mins", distance: "1.2 Miles", avatarColor: Color.orange.opacity(0.2)),
-        PetRequest(initials: "ML", name: "Luna", breed: "Siamese Cat", tag: "SIT", date: "Oct 26, 2023", time: "09:00 AM", duration: "2 Hours", distance: "0.8 Miles", avatarColor: Color.blue.opacity(0.1)),
-        PetRequest(initials: "RB", name: "Bruno", breed: "Beagle", tag: "WALK", date: "Oct 28, 2023", time: "11:00 AM", duration: "1 Hour", distance: "2.5 Miles", avatarColor: Color.green.opacity(0.1))
+        PetRequest(imageName: "dog2", name: "Cooper", breed: "Golden Retriever", tag: "WALK", date: "Oct 24, 2023", time: "02:30 PM", duration: "45 Mins", distance: "1.2 Miles", avatarColor: .orange.opacity(0.2)),
+        PetRequest(imageName: "dog3", name: "Luna", breed: "Siamese Cat", tag: "SIT", date: "Oct 26, 2023", time: "09:00 AM", duration: "2 Hours", distance: "0.8 Miles", avatarColor: .blue.opacity(0.1)),
+        PetRequest(imageName: "dog4", name: "Bruno", breed: "Beagle", tag: "WALK", date: "Oct 28, 2023", time: "11:00 AM", duration: "1 Hour", distance: "2.5 Miles", avatarColor: .green.opacity(0.1))
     ]
     
-    // Alert State
+    // Alert States
     @State private var showingAlert = false
     @State private var selectedRequest: PetRequest?
     @State private var alertTitle = ""
+    
+    // Logout Alert State
+    @State private var showingLogoutAlert = false
 
     var body: some View {
         NavigationStack {
@@ -57,7 +60,8 @@ struct RequestsView: View {
             }
             .navigationTitle("Requests")
             .navigationBarTitleDisplayMode(.large)
-            // Confirmation Alert
+            
+            // Request Action Alert
             .alert(alertTitle, isPresented: $showingAlert, presenting: selectedRequest) { request in
                 Button("Cancel", role: .cancel) { }
                 Button(alertTitle.contains("Accept") ? "Accept" : "Decline", role: .destructive) {
@@ -66,23 +70,34 @@ struct RequestsView: View {
             } message: { request in
                 Text("Are you sure you want to proceed with \(request.name)?")
             }
+            
+            // Logout Confirmation Alert
+            .alert("Logout", isPresented: $showingLogoutAlert) {
+                Button("Cancel", role: .cancel) { }
+                Button("Logout", role: .destructive) {
+                    Task {
+                        await authViewModel.signOut()
+                    }
+                }
+            } message: {
+                Text("Are you sure you want to logout?")
+            }
+            
             .toolbar {
-                            ToolbarItem(placement: .navigationBarTrailing) {
-                                Menu {
-                                    Button(role: .destructive) {
-                                        Task {
-                                            await authViewModel.signOut()
-                                        }
-                                    } label: {
-                                        Label("Logout", systemImage: "rectangle.portrait.and.arrow.right")
-                                    }
-                                } label: {
-                                    Image(systemName: "ellipsis.circle") // The "eclipse" (ellipsis) symbol
-                                        .font(.title3)
-                                        .foregroundColor(.orange)
-                                }
-                            }
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Menu {
+                        Button(role: .destructive) {
+                            showingLogoutAlert = true
+                        } label: {
+                            Label("Logout", systemImage: "rectangle.portrait.and.arrow.right")
                         }
+                    } label: {
+                        Image(systemName: "ellipsis")
+                            .font(.title3)
+                            .foregroundColor(.orange)
+                    }
+                }
+            }
         }
     }
 
@@ -105,8 +120,10 @@ struct RequestCardView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 20) {
             HStack(alignment: .top) {
-                Text(request.initials)
-                    .font(.headline)
+                // FETCHING ASSET IMAGES HERE
+                Image(request.imageName)
+                    .resizable()
+                    .scaledToFill()
                     .frame(width: 50, height: 50)
                     .background(request.avatarColor)
                     .clipShape(RoundedRectangle(cornerRadius: 12))
@@ -195,4 +212,5 @@ struct InfoItem: View {
 
 #Preview {
     RequestsView()
+        .environmentObject(AuthViewModel())
 }

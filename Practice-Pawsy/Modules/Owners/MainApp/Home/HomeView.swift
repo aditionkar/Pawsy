@@ -46,6 +46,9 @@ struct HomeView: View {
         Suggestion(icon: "house.fill", title: "Busy for a day?", subtitle: "Book a pet sitter", color: .purple, action: "sitter")
     ]
     
+    // Logout Alert State
+    @State private var showingLogoutAlert = false
+    
     // MARK: - Computed Properties
     
     // Extract first name from email
@@ -113,7 +116,7 @@ struct HomeView: View {
                     // MARK: Need a Hand?
                     VStack(alignment: .leading, spacing: 16) {
                         HStack {
-                            Text("Need a Hand? 🐾")
+                            Text("Need a Hand?")
                                 .font(.system(size: 20, weight: .semibold, design: .rounded))
                                 .foregroundColor(.primary)
                             Spacer()
@@ -135,15 +138,25 @@ struct HomeView: View {
                 .padding(.bottom, 32)
             }
             .background(Color(.systemGroupedBackground))
-            .navigationTitle("Hey, \(ownerName) 👋")
+            .navigationTitle("Hey, \(ownerName)")
+            
+            // Logout Confirmation Alert
+            .alert("Logout", isPresented: $showingLogoutAlert) {
+                Button("Cancel", role: .cancel) { }
+                Button("Logout", role: .destructive) {
+                    Task {
+                        await authViewModel.signOut()
+                    }
+                }
+            } message: {
+                Text("Are you sure you want to logout?")
+            }
             
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Menu {
                         Button(role: .destructive) {
-                            Task {
-                                await authViewModel.signOut()
-                            }
+                            showingLogoutAlert = true
                         } label: {
                             Label("Logout", systemImage: "rectangle.portrait.and.arrow.right")
                         }

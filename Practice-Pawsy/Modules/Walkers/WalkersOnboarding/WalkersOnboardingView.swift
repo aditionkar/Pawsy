@@ -9,11 +9,11 @@ import SwiftUI
 
 struct WalkersOnboardingView: View {
     @State private var currentStep = 0
-    let totalSteps = 3
+    // UPDATED: Changed total steps to 2
+    let totalSteps = 2
     @State private var isOnboardingComplete = false
     
     // Walker-specific state variables
-    @State private var selectedOption: String? = nil
     @State private var fullName: String = ""
     @State private var phone: String = ""
     @State private var city: String = ""
@@ -83,18 +83,15 @@ struct WalkersOnboardingView: View {
                     Group {
                         switch currentStep {
                         case 0:
-                            WalkerOrSitterView(
-                                selectedOption: $selectedOption,
-                                onNext: { withAnimation { currentStep = 1 } }
-                            )
-                        case 1:
+                            // UPDATED: Now starts directly with Details
                             WalkersDetailsView(
                                 fullName: $fullName,
                                 phone: $phone,
                                 city: $city,
-                                onNext: { withAnimation { currentStep = 2 } }
+                                onNext: { withAnimation { currentStep = 1 } }
                             )
-                        case 2:
+                        case 1:
+                            // UPDATED: Now the final step
                             WalkersAvailabilityView(
                                 selectedDays: $selectedDays,
                                 fromTime: $fromTime,
@@ -120,15 +117,6 @@ struct WalkersOnboardingView: View {
         }
     }
 }
-
-
-// MARK: - Updated WalkerOrSitterView
-
-
-// MARK: - Updated WalkersDetailsView
-
-
-// MARK: - Updated WalkersAvailabilityView
 
 #Preview {
     WalkersOnboardingView()

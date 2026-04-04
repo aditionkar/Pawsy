@@ -6,9 +6,69 @@
 //
 
 import SwiftUI
+internal import Auth
 
 struct WalkersProfileView: View {
     @State private var notificationsEnabled = true
+    @EnvironmentObject var authViewModel: AuthViewModel
+    
+    // Availability state variables
+    @State private var selectedDays: Set<String> = ["MON", "THU", "SAT"]
+    @State private var fromTime = Calendar.current.date(from: DateComponents(hour: 8, minute: 0)) ?? Date()
+    @State private var toTime = Calendar.current.date(from: DateComponents(hour: 18, minute: 0)) ?? Date()
+    @State private var isAvailableOnShortNotice = true
+    @State private var showEditAvailability = false
+    
+    var ownerName: String {
+        guard let email = authViewModel.currentUser?.email else {
+            return "Pet Parent"
+        }
+        let emailPrefix = email.split(separator: "@").first?.lowercased() ?? ""
+        let nameParts = emailPrefix.split { $0 == "." || $0 == "_" || $0 == "-" }
+        if let firstName = nameParts.first {
+            return firstName.capitalized
+        }
+        return emailPrefix.capitalized
+    }
+
+    var initials: String {
+        String(ownerName.prefix(2)).uppercased()
+    }
+    
+    // Computed properties for displaying availability
+    var weekdayAvailability: String {
+        let weekdays = ["MON", "TUE", "WED", "THU", "FRI"]
+        let selectedWeekdays = weekdays.filter { selectedDays.contains($0) }
+        if selectedWeekdays.count == 5 {
+            return "Mon — Fri"
+        } else if !selectedWeekdays.isEmpty {
+            return selectedWeekdays.joined(separator: ", ").capitalized
+        }
+        return "No weekdays selected"
+    }
+    
+    var weekendAvailability: String {
+        let weekends = ["SAT", "SUN"]
+        let selectedWeekends = weekends.filter { selectedDays.contains($0) }
+        if selectedWeekends.count == 2 {
+            return "Sat — Sun"
+        } else if !selectedWeekends.isEmpty {
+            return selectedWeekends.joined(separator: ", ").capitalized
+        }
+        return "No weekends selected"
+    }
+    
+    var formattedFromTime: String {
+        let formatter = DateFormatter()
+        formatter.timeStyle = .short
+        return formatter.string(from: fromTime)
+    }
+    
+    var formattedToTime: String {
+        let formatter = DateFormatter()
+        formatter.timeStyle = .short
+        return formatter.string(from: toTime)
+    }
     
     var body: some View {
         NavigationStack {
@@ -21,14 +81,14 @@ struct WalkersProfileView: View {
                         
                         // MARK: - Header Section
                         VStack(spacing: 8) {
-                            Text("DG")
+                            Text(initials)
                                 .font(.system(size: 32, weight: .bold))
                                 .frame(width: 100, height: 100)
                                 .background(Color.orange.opacity(0.2))
                                 .foregroundColor(.brown)
                                 .clipShape(RoundedRectangle(cornerRadius: 25))
-                            
-                            Text("Dhruva Gulaty")
+
+                            Text(ownerName)
                                 .font(.title)
                                 .fontWeight(.bold)
                             
@@ -41,20 +101,40 @@ struct WalkersProfileView: View {
 
                         // MARK: - Stats Row
                         HStack(spacing: 12) {
-                            StatBox(number: "142", label: "WALKS")
-                            StatBox(number: "28", label: "SITS")
-                            StatBox(number: "4.9 ★", label: "RATING")
+                            StatBox(number: "42", label: "Walks")
+                            StatBox(number: "18", label: "Sits")
+                            StatBox(number: "4.9 ★", label: "Rating")
                         }
                         .padding(.horizontal)
 
                         // MARK: - Availability Section
                         VStack(alignment: .leading, spacing: 12) {
-                            // Show edit button here
-                            SectionHeader(title: "AVAILABILITY", showEdit: true)
+                            SectionHeader(title: "Avalability", showEdit: true) {
+                                showEditAvailability = true
+                            }
                             
                             VStack(spacing: 16) {
-                                AvailabilityRow(days: "Mon — Fri", time: "08:00 AM - 06:00 PM")
-                                AvailabilityRow(days: "Sat — Sun", time: "10:00 AM - 04:00 PM")
+                                AvailabilityRow(
+                                    days: weekdayAvailability,
+                                    time: "\(formattedFromTime) - \(formattedToTime)"
+                                )
+                                AvailabilityRow(
+                                    days: weekendAvailability,
+                                    time: "\(formattedFromTime) - \(formattedToTime)"
+                                )
+                                
+                                if isAvailableOnShortNotice {
+                                    HStack {
+                                        Image(systemName: "bolt.fill")
+                                            .font(.caption)
+                                            .foregroundColor(.orange)
+                                        Text("Available on short notice")
+                                            .font(.caption)
+                                            .foregroundColor(.orange)
+                                        Spacer()
+                                    }
+                                    .padding(.top, 8)
+                                }
                             }
                             .padding(25)
                             .background(Color(uiColor: .secondarySystemGroupedBackground))
@@ -64,8 +144,9 @@ struct WalkersProfileView: View {
 
                         // MARK: - Settings Section
                         VStack(alignment: .leading, spacing: 12) {
-                            // No edit button here
-                            SectionHeader(title: "SETTINGS", showEdit: false)
+                            SectionHeader(title: "Settings", showEdit: false) {
+                                // No action needed
+                            }
                             
                             VStack(spacing: 0) {
                                 Toggle(isOn: $notificationsEnabled) {
@@ -77,7 +158,11 @@ struct WalkersProfileView: View {
                                 
                                 Divider().padding(.leading, 50)
                                 
-                                Button(action: { /* Log out logic */ }) {
+                                Button(action: {
+                                    Task {
+                                        await authViewModel.signOut()
+                                    }
+                                }) {
                                     HStack {
                                         Label("Log out", systemImage: "rectangle.portrait.and.arrow.right")
                                             .fontWeight(.medium)
@@ -97,6 +182,14 @@ struct WalkersProfileView: View {
             }
             .navigationTitle("Profile")
             .navigationBarTitleDisplayMode(.large)
+            .sheet(isPresented: $showEditAvailability) {
+                EditAvailabilityView(
+                    selectedDays: $selectedDays,
+                    fromTime: $fromTime,
+                    toTime: $toTime,
+                    isAvailableOnShortNotice: $isAvailableOnShortNotice
+                )
+            }
         }
     }
 }
@@ -105,7 +198,8 @@ struct WalkersProfileView: View {
 
 struct SectionHeader: View {
     let title: String
-    let showEdit: Bool // Toggle visibility of the Edit button
+    let showEdit: Bool
+    let onEdit: () -> Void
     
     var body: some View {
         HStack {
@@ -118,10 +212,12 @@ struct SectionHeader: View {
             Spacer()
             
             if showEdit {
-                Button("Edit") { }
-                    .font(.subheadline)
-                    .fontWeight(.bold)
-                    .foregroundColor(.brown)
+                Button(action: onEdit) {
+                    Text("Edit")
+                        .font(.subheadline)
+                        .fontWeight(.bold)
+                        .foregroundColor(.brown)
+                }
             }
         }
     }
@@ -168,4 +264,5 @@ struct AvailabilityRow: View {
 
 #Preview {
     WalkersProfileView()
+        .environmentObject(AuthViewModel())
 }
