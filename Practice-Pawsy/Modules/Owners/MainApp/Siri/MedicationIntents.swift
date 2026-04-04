@@ -25,21 +25,3 @@ struct UpcomingMedicationIntent: AppIntent {
         )
     }
 }
-
-struct PastMedicationIntent: AppIntent {
-    static var title: LocalizedStringResource = "Show Past Medications"
-    static var description = IntentDescription("Shows past medication records in Pawsy.")
-
-    @MainActor
-    func perform() async throws -> some ProvidesDialog & ShowsSnippetView {
-        let reminders = ReminderStore.shared.pastMedication()
-        
-        guard !reminders.isEmpty else {
-            return .result(dialog: "No past medication records in Pawsy.", view: EmptyRemindersView())
-        }
-        return .result(
-            dialog: "Here are your past medications.",
-            view: ReminderSnippetView(reminders: reminders, mode: .past, category: .medication)
-        )
-    }
-}
